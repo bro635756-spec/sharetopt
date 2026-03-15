@@ -3,60 +3,325 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShareTopt</title>
+<title>ShareTopt Connect - Elite v2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-<link rel="stylesheet" href="style.css">
+<style>
+/* Elite CSS - Burak Pro Edition */
+:root {
+    --bg-dark: #05060f;
+    --bg-card: rgba(17, 24, 39, 0.75);
+    --accent: #8b5cf6;
+    --accent-glow: rgba(139, 92, 246, 0.4);
+    --success: #10b981;
+    --danger: #ef4444;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --border: rgba(255, 255, 255, 0.08);
+    --glass-blur: 16px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background: var(--bg-dark);background-image: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 40%), radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 40%);color: var(--text-primary);font-family: 'Plus Jakarta Sans', sans-serif;line-height:1.6;min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg-dark);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px;}::-webkit-scrollbar-thumb:hover{background:var(--accent);}
+header{position:sticky;top:0;z-index:100;padding:20px 6%;background:rgba(5,6,15,0.7);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.logo{font-size:1.5rem;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,#a78bfa 0%,#f472b6 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase;}
+.glass{background:var(--bg-card);backdrop-filter:blur(var(--glass-blur));border:1px solid var(--border);border-radius:28px;padding:25px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);transition:var(--transition);}
+.glass:hover{border-color:rgba(139,92,246,0.3);box-shadow:0 0 30px var(--accent-glow);}
+input,textarea{width:100%;padding:16px 20px;background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:18px;color:white;font-size:1rem;margin-bottom:15px;transition:var(--transition);}
+input:focus,textarea:focus{outline:none;border-color:var(--accent);background:rgba(0,0,0,0.6);box-shadow:0 0 0 4px var(--accent-glow);}
+button{background:var(--accent);color:white;border:none;padding:16px;border-radius:18px;font-weight:700;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:var(--transition);}
+button:hover{transform:translateY(-3px);box-shadow:0 10px 25px var(--accent-glow);filter:brightness(1.1);}
+.profile-hero{text-align:center;padding-top:20px;}
+.p-avatar{width:110px;height:110px;border-radius:40px;object-fit:cover;border:3px solid var(--accent);padding:5px;background:var(--bg-dark);box-shadow:0 15px 35px var(--accent-glow);margin-bottom:20px;}
+.id-box{font-family:'JetBrains Mono',monospace;font-size:0.7rem;background:linear-gradient(90deg,rgba(139,92,246,0.1)0%,transparent 100%);border-left:4px solid var(--accent);padding:15px;border-radius:12px;margin:20px 0;color:var(--accent);cursor:pointer;word-break:break-all;transition:var(--transition);position:relative;overflow:hidden;}
+.id-box::after{content:'Tıkla ve Kopyala';position:absolute;right:10px;bottom:5px;font-size:0.6rem;opacity:0.4;}
+.id-box:hover{background:rgba(139,92,246,0.15);transform:scale(1.02);}
+.chat-item{display:flex;align-items:center;gap:15px;padding:18px;border-radius:20px;cursor:pointer;transition:var(--transition);margin-bottom:8px;}
+.chat-item:hover{background:rgba(255,255,255,0.05);}
+.avatar-initial{width:50px;height:50px;border-radius:16px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:800;color:white;}
+.dm-screen{position:fixed;inset:0;background:var(--bg-dark);z-index:2000;display:none;flex-direction:column;}
+.chat-header{padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:15px;background:rgba(13,17,30,0.8);backdrop-filter:blur(10px);}
+.chat-messages{flex:1;overflow-y:auto;padding:25px;display:flex;flex-direction:column;gap:12px;}
+.msg{padding:14px 18px;border-radius:22px;max-width:75%;font-size:0.95rem;animation:slideIn 0.3s ease-out;}
+@keyframes slideIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.msg.sent{align-self:flex-end;background:var(--accent);border-bottom-right-radius:4px;box-shadow:0 4px 15px var(--accent-glow);}
+.msg.received{align-self:flex-start;background:#1f2937;border-bottom-left-radius:4px;}
+nav{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);width:85%;max-width:400px;background:rgba(17,24,39,0.85);backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:30px;display:flex;justify-content:space-around;padding:12px;box-shadow:0 20px 40px rgba(0,0,0,0.6);z-index:1000;}
+.nav-link{color:var(--text-secondary);font-size:1.4rem;padding:10px;cursor:pointer;transition:var(--transition);}
+.nav-link.active{color:var(--accent);text-shadow:0 0 15px var(--accent);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:3000;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-content{width:100%;max-width:380px;animation:zoomIn 0.3s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes zoomIn{from{opacity:0;transform:scale(0.9);}to{opacity:1;transform:scale(1);}}
+.hidden{display:none !important;}
+.text-center{text-align:center;}
+.mt-20{margin-top:20px;}
+.id-copy-success{color:var(--success)!important;border-color:var(--success)!important;}
+.content-wrapper{padding-bottom:120px;}
+</style>
 </head>
 
 <body>
-
 <header>
-<h2>ShareTopt</h2>
+    <div class="logo">SHARETOPT</div>
+    <i class="fas fa-user-plus" onclick="showAddFriendModal()" style="color:var(--accent); cursor:pointer;"></i>
 </header>
 
-<div id="authBox">
-<h3>Giriş / Kayıt</h3>
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Şifre">
-<button onclick="login()">Giriş Yap</button>
-<button onclick="register()">Kayıt Ol</button>
+<div class="content-wrapper" style="max-width:450px;margin:auto;padding:10px 15px 120px 15px;">
+    <div id="auth-box" class="glass">
+        <h2 class="text-center">Giriş / Kayıt</h2>
+        <input type="email" id="email" placeholder="E-posta">
+        <input type="password" id="pass" placeholder="Şifre">
+        <button id="auth-btn">Giriş Yap / Devam Et</button>
+        <p id="auth-switch" class="text-center mt-20" style="opacity:0.6;cursor:pointer;">Yeni Hesap Oluştur</p>
+    </div>
+
+    <div id="chat-tab" class="hidden">
+        <h3 style="margin-bottom:15px; opacity:0.6;">Mesajlar</h3>
+        <div id="chat-list" class="glass" style="padding:10px;"></div>
+    </div>
+
+    <div id="profile-tab" class="hidden">
+        <div class="profile-hero glass text-center">
+            <img id="p-avatar" class="p-avatar" src="">
+            <h2 id="p-name-view">...</h2>
+            <div class="id-box" id="my-id-display" onclick="copyId()">ID Yükleniyor...</div>
+            <p id="p-bio-view" style="opacity:0.6;margin-top:10px;"></p>
+        </div>
+        <div class="glass mt-20">
+            <input type="text" id="edit-name" placeholder="İsim Değiştir">
+            <textarea id="edit-bio" placeholder="Hakkında..."></textarea>
+            <button id="save-profile">Güncelle</button>
+        </div>
+        <button class="glass mt-20" style="background:#1f2937; width:100%;" onclick="logout()">Çıkış</button>
+    </div>
+
+    <div id="community-tab" class="hidden">
+        <h3 style="margin-bottom:15px; opacity:0.6;">Topluluk</h3>
+        <div id="community-list" class="glass" style="padding:10px;"></div>
+    </div>
 </div>
 
-<div id="app" class="hidden">
-
-<section>
-<h3>Profil</h3>
-<p>ID: <span id="myId"></span></p>
-</section>
-
-<section>
-<h3>Arkadaş Ekle</h3>
-<input id="friendInput" placeholder="ID veya isim">
-<button onclick="addFriend()">Ekle</button>
-</section>
-
-<section>
-<h3>Arkadaşlar</h3>
-<div id="friends"></div>
-</section>
-
-<section>
-<h3>Chat</h3>
-<div id="chatBox"></div>
-<input id="message">
-<button onclick="sendMessage()">Gönder</button>
-</section>
-
-<section>
-<h3>Topluluk</h3>
-<input id="postInput">
-<button onclick="post()">Paylaş</button>
-<div id="posts"></div>
-</section>
-
+<div id="dm-screen" class="dm-screen">
+    <div class="chat-header">
+        <i class="fas fa-arrow-left" onclick="closeDM()" style="cursor:pointer;"></i>
+        <div id="dm-title" style="font-weight:800;"></div>
+    </div>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div style="padding:15px;display:flex;gap:10px;background: #0d111e; border-top:1px solid var(--border);">
+        <input type="text" id="dm-input" placeholder="Mesaj..." style="margin-bottom:0;flex:1;">
+        <button id="dm-send" style="width:60px;"><i class="fas fa-paper-plane"></i></button>
+    </div>
 </div>
 
-<script type="module" src="app.js"></script>
+<div id="friend-modal" class="modal-overlay">
+    <div class="modal-content glass">
+        <h3 style="margin-bottom:15px;">Arkadaş Ekle</h3>
+        <input type="text" id="friend-id-input" placeholder="sjst_swq-01-xxxx_02-xxxx">
+        <button id="friend-add-btn">Ekle</button>
+        <button style="background:transparent;color:#9ca3af;margin-top:10px; width:100%;" onclick="closeFriendModal()">Kapat</button>
+    </div>
+</div>
 
+<nav id="navbar" class="hidden">
+    <div class="nav-link active" onclick="showTab('chat',this)"><i class="fas fa-comment"></i></div>
+    <div class="nav-link" onclick="showTab('community',this)"><i class="fas fa-users"></i></div>
+    <div class="nav-link" onclick="showTab('profile',this)"><i class="fas fa-user"></i></div>
+</nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getDatabase, ref, set, push, onValue, get, query, orderByChild, equalTo, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAFtCQjGACAmoOSEIazC648I1BaLPkT8-U",
+    authDomain: "share-your-thoughts-e15a7.firebaseapp.com",
+    databaseURL: "https://share-your-thoughts-e15a7-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "share-your-thoughts-e15a7",
+    appId: "1:102377464042:web:78864708767905d41f77d3"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+let currentUserData = null;
+let activeFriendId = null;
+let isLogin = true;
+
+const generateID = () => {
+    const r = () => Math.random().toString(36).substring(2, 6);
+    return `sjst_swq-01-${r()}_02-${r()}`;
+};
+
+// Auth Actions
+document.getElementById('auth-btn').onclick = async () => {
+    const email = document.getElementById('email').value;
+    const pass = document.getElementById('pass').value;
+    if(!email || !pass) return alert("Bilgileri doldur!");
+    try {
+        if(isLogin) await signInWithEmailAndPassword(auth,email,pass);
+        else {
+            const res = await createUserWithEmailAndPassword(auth,email,pass);
+            const newId = generateID();
+            await set(ref(db,`users/${res.user.uid}`),{
+                customId: newId,
+                name:"Yeni Kullanıcı",
+                bio:"Merhaba!",
+                img:`https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${newId}`
+            });
+        }
+    } catch(err){ alert(err.message); }
+};
+
+document.getElementById('auth-switch').onclick = () => {
+    isLogin = !isLogin;
+    document.getElementById('auth-btn').innerText = isLogin?"Giriş Yap":"Hesap Oluştur";
+};
+
+onAuthStateChanged(auth,(user)=>{
+    if(user){
+        document.getElementById('auth-box').classList.add('hidden');
+        document.getElementById('navbar').classList.remove('hidden');
+        showTab('chat', document.querySelector('.nav-link'));
+        onValue(ref(db,`users/${user.uid}`),(snap)=>{
+            currentUserData = snap.val();
+            if(!currentUserData) return;
+            document.getElementById('p-name-view').innerText = currentUserData.name;
+            document.getElementById('p-bio-view').innerText = currentUserData.bio;
+            document.getElementById('p-avatar').src = currentUserData.img;
+            document.getElementById('my-id-display').innerText = currentUserData.customId;
+            loadFriends();
+            loadCommunity();
+        });
+    } else {
+        document.getElementById('auth-box').classList.remove('hidden');
+        document.getElementById('navbar').classList.add('hidden');
+        document.getElementById('chat-tab').classList.add('hidden');
+        document.getElementById('profile-tab').classList.add('hidden');
+        document.getElementById('community-tab').classList.add('hidden');
+    }
+});
+
+// Navigation
+window.showTab = (tab, el) => {
+    document.querySelectorAll('.nav-link').forEach(b=>b.classList.remove('active'));
+    el.classList.add('active');
+    ['chat','profile','community'].forEach(t => document.getElementById(`${t}-tab`).classList.add('hidden'));
+    document.getElementById(`${tab}-tab`).classList.remove('hidden');
+};
+
+// Friends & Messaging
+function loadFriends() {
+    onValue(ref(db, `friends/${auth.currentUser.uid}`), (snap) => {
+        const list = document.getElementById('chat-list');
+        list.innerHTML = "";
+        snap.forEach(child => {
+            const f = child.val();
+            const div = document.createElement('div');
+            div.className = "chat-item";
+            div.innerHTML = `<div class="avatar-initial">${f.name[0]}</div><div><strong>${f.name}</strong><br><small style="opacity:0.5">${f.id}</small></div>`;
+            div.onclick = () => openDM(f.id, f.name);
+            list.appendChild(div);
+        });
+    });
+}
+
+function loadCommunity() {
+    get(ref(db, 'users')).then(snap => {
+        const list = document.getElementById('community-list');
+        list.innerHTML = "";
+        snap.forEach(child => {
+            const u = child.val();
+            if(u.customId === currentUserData.customId) return;
+            const div = document.createElement('div');
+            div.className = "chat-item";
+            div.innerHTML = `<img src="${u.img}" style="width:40px; border-radius:10px;"><div><strong>${u.name}</strong><br><small style="opacity:0.4">${u.customId}</small></div>`;
+            div.onclick = () => {
+                document.getElementById('friend-id-input').value = u.customId;
+                showAddFriendModal();
+            };
+            list.appendChild(div);
+        });
+    });
+}
+
+window.openDM = (fid, fname) => {
+    activeFriendId = fid;
+    document.getElementById('dm-screen').style.display = 'flex';
+    document.getElementById('dm-title').innerText = fname;
+    const room = [currentUserData.customId, fid].sort().join("_");
+    onValue(ref(db, `chats/${room}`), (snap) => {
+        const area = document.getElementById('chat-messages');
+        area.innerHTML = "";
+        snap.forEach(msg => {
+            const m = msg.val();
+            const d = document.createElement('div');
+            d.className = `msg ${m.sender === currentUserData.customId ? 'sent' : 'received'}`;
+            d.innerText = m.text;
+            area.appendChild(d);
+        });
+        area.scrollTop = area.scrollHeight;
+    });
+};
+
+document.getElementById('dm-send').onclick = () => {
+    const txt = document.getElementById('dm-input').value;
+    if(!txt || !activeFriendId) return;
+    const room = [currentUserData.customId, activeFriendId].sort().join("_");
+    push(ref(db, `chats/${room}`), {
+        sender: currentUserData.customId,
+        text: txt,
+        time: serverTimestamp()
+    });
+    document.getElementById('dm-input').value = "";
+};
+
+// Profile Update
+document.getElementById('save-profile').onclick = () => {
+    const name = document.getElementById('edit-name').value;
+    const bio = document.getElementById('edit-bio').value;
+    if(name) set(ref(db,`users/${auth.currentUser.uid}/name`), name);
+    if(bio) set(ref(db,`users/${auth.currentUser.uid}/bio`), bio);
+    alert("Güncellendi!");
+};
+
+// Modals
+window.showAddFriendModal = () => document.getElementById('friend-modal').style.display = 'flex';
+window.closeFriendModal = () => document.getElementById('friend-modal').style.display = 'none';
+window.closeDM = () => document.getElementById('dm-screen').style.display = 'none';
+
+document.getElementById('friend-add-btn').onclick = async () => {
+    const fid = document.getElementById('friend-id-input').value.trim();
+    if(fid === currentUserData.customId) return alert("Kendini ekleyemezsin!");
+    const q = query(ref(db,"users"),orderByChild("customId"),equalTo(fid));
+    const s = await get(q);
+    if(s.exists()){
+        const f = Object.values(s.val())[0];
+        await set(ref(db,`friends/${auth.currentUser.uid}/${fid.replace(/[^a-z0-9]/gi,'')}`),{id:fid,name:f.name});
+        alert("Arkadaş eklendi!");
+        closeFriendModal();
+    } else alert("Kullanıcı bulunamadı!");
+};
+
+window.copyId = () => {
+    const el = document.getElementById('my-id-display');
+    navigator.clipboard.writeText(el.innerText).then(()=>{
+        const originalText = currentUserData.customId;
+        el.classList.add('id-copy-success');
+        el.innerText = "KOPYALANDI!";
+        setTimeout(()=>{
+            el.classList.remove('id-copy-success');
+            el.innerText = originalText;
+        },1500);
+    });
+};
+
+window.logout = () => signOut(auth);
+</script>
 </body>
   </html>
+
+v-195 ©SJ Studio Company
