@@ -5,202 +5,255 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ShareTopt Pro v18</title>
 
-<!-- Firebase SDK -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root {
+    --bg: #0b0f1a;
+    --card: #161e2d;
+    --accent: #6366f1; /* Modern Indigo */
+    --accent-hover: #4f46e5;
+    --text-main: #f8fafc;
+    --text-dim: #94a3b8;
+    --border: #2d3748;
+    --radius: 12px;
+}
+
+* { box-sizing: border-box; scroll-behavior: smooth; }
+body { 
+    margin: 0; 
+    font-family: 'Inter', sans-serif; 
+    background: var(--bg); 
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+/* Header & Nav */
+header {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem 5%; background: rgba(22, 30, 45, 0.8);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+}
+.logo { font-weight: 600; font-size: 1.2rem; color: var(--accent); }
+.nav-links { display: flex; gap: 20px; align-items: center; }
+.nav-links a { color: var(--text-dim); text-decoration: none; transition: 0.3s; font-size: 0.9rem; }
+.nav-links a:hover { color: var(--accent); }
+
+/* Layout */
+.container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+
+/* Cards & Components */
+.glass-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 25px; margin-bottom: 25px;
+}
+
+.input-group { margin-bottom: 15px; }
+input, textarea {
+    width: 100%; padding: 12px; background: #0f172a;
+    border: 1px solid var(--border); border-radius: 8px;
+    color: white; transition: 0.3s;
+}
+input:focus { border-color: var(--accent); outline: none; }
+
+button {
+    background: var(--accent); color: white; border: none;
+    padding: 12px 24px; border-radius: 8px; cursor: pointer;
+    font-weight: 600; transition: 0.3s; width: 100%;
+}
+button:hover { background: var(--accent-hover); transform: translateY(-1px); }
+button.secondary { background: transparent; border: 1px solid var(--border); margin-top: 10px; }
+
+/* Idea List */
+.idea-card {
+    background: #1e293b; padding: 20px; border-radius: var(--radius);
+    margin-top: 15px; border-left: 4px solid var(--accent);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.idea-card p { margin: 0; font-size: 1rem; }
+.idea-card small { color: var(--text-dim); }
+.delete-btn { color: #ef4444; background: none; width: auto; padding: 5px; }
+
+/* Auth Toggle */
+#auth-box { max-width: 400px; margin: 100px auto; text-align: center; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><i class="fas fa-rocket"></i> ShareTopt</div>
+    <div class="nav-links" id="main-nav">
+        <a href="#app">Fikirler</a>
+        <a href="#friends-section">Arkadaşlar</a>
+        <a href="#help-section">Yardım</a>
+        <span id="user-display" style="font-size: 0.8rem; color: var(--accent)"></span>
+        <a href="#" id="logout-btn" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i></a>
+    </div>
+</header>
+
+<div class="container">
+    <div id="auth-box" class="glass-card">
+        <h2 id="auth-title">Hoş Geldiniz</h2>
+        <input type="email" id="email" placeholder="E-posta Adresi">
+        <input type="password" id="pass" placeholder="Şifre">
+        <button id="login-action-btn">Giriş Yap</button>
+        <button class="secondary" id="switch-auth">Hesap Oluştur</button>
+    </div>
+
+    <div id="app" class="hidden">
+        <div class="glass-card">
+            <h3>Yeni Bir Fikir Paylaş</h3>
+            <textarea id="idea-input" placeholder="Aklınızda ne var?" rows="3"></textarea>
+            <button id="add-idea-btn">Paylaş</button>
+        </div>
+
+        <div id="ideas-container"></div>
+
+        <section id="friends-section" class="glass-card" style="margin-top: 50px;">
+            <h3><i class="fas fa-users"></i> Arkadaşlar</h3>
+            <div style="display: flex; gap: 10px;">
+                <input type="email" id="friend-input" placeholder="Arkadaş e-postası">
+                <button id="add-friend-btn" style="width: auto;">Ekle</button>
+            </div>
+            <ul id="friends-list" style="list-style: none; padding: 0; margin-top: 15px;"></ul>
+        </section>
+
+        <section id="help-section" class="glass-card" style="border-left: 4px solid #facc15;">
+            <h3><i class="fas fa-question-circle"></i> Yardım Merkezi</h3>
+            <p>ShareTopt ile fikirlerinizi anlık olarak kaydedebilir ve eklediğiniz arkadaşlarınızın listesini yönetebilirsiniz.</p>
+        </section>
+    </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-// Firebase config
 const firebaseConfig = {
-  apiKey: "AIzaSyAFtCQjGACAmoOSEIazC648I1BaLPkT8-U",
-  authDomain: "share-your-thoughts-e15a7.firebaseapp.com",
-  databaseURL: "https://share-your-thoughts-e15a7-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "share-your-thoughts-e15a7",
-  storageBucket: "share-your-thoughts-e15a7.firebasestorage.app",
-  messagingSenderId: "137665399298",
-  appId: "1:137665399298:web:60e7087fc41db2670f751b"
+    apiKey: "AIzaSyAFtCQjGACAmoOSEIazC648I1BaLPkT8-U",
+    authDomain: "share-your-thoughts-e15a7.firebaseapp.com",
+    databaseURL: "https://share-your-thoughts-e15a7-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "share-your-thoughts-e15a7",
+    storageBucket: "share-your-thoughts-e15a7.firebasestorage.app",
+    messagingSenderId: "137665399298",
+    appId: "1:137665399298:web:60e7087fc41db2670f751b"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-let currentUser = null;
+// Global State
+let isLoginMode = true;
 
-// Auth state listener
+// DOM Elements
+const authBox = document.getElementById("auth-box");
+const appBox = document.getElementById("app");
+const userDisplay = document.getElementById("user-display");
+const loginBtn = document.getElementById("login-action-btn");
+const switchBtn = document.getElementById("switch-auth");
+
+// Auth State Listener
 onAuthStateChanged(auth, user => {
-  if(user){
-    currentUser = user;
-    document.getElementById("user-email").innerText = user.email;
-    document.getElementById("auth").style.display = "none";
-    document.getElementById("app").style.display = "block";
-    loadIdeas();
-    loadFriends();
-  } else {
-    currentUser = null;
-    document.getElementById("auth").style.display = "block";
-    document.getElementById("app").style.display = "none";
-  }
+    if(user){
+        authBox.classList.add("hidden");
+        appBox.classList.remove("hidden");
+        userDisplay.innerText = user.email;
+        loadIdeas();
+        loadFriends(user.uid);
+    } else {
+        authBox.classList.remove("hidden");
+        appBox.classList.add("hidden");
+        userDisplay.innerText = "";
+    }
 });
 
-// Register
-window.register = async () => {
-  const email = document.getElementById("reg-email").value.trim();
-  const pass = document.getElementById("reg-pass").value.trim();
-  if(!email || !pass) return alert("Email ve şifre girin");
-  try{
-    const res = await createUserWithEmailAndPassword(auth, email, pass);
-    const uid = "sj-" + Math.random().toString(36).substring(2,10) + "_v18-" + Date.now();
-    await set(ref(db,"users/"+res.user.uid), {email: email, userId: uid});
-    alert("Kayıt başarılı! ID: "+uid);
-  } catch(e) { alert(e.message); }
-}
+// Logic: Login / Register
+loginBtn.onclick = async () => {
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("pass").value;
+    try {
+        if(isLoginMode) {
+            await signInWithEmailAndPassword(auth, email, pass);
+        } else {
+            const res = await createUserWithEmailAndPassword(auth, email, pass);
+            await set(ref(db, `users/${res.user.uid}`), { email, createdAt: Date.now() });
+            alert("Kayıt başarılı!");
+        }
+    } catch(e) { alert("Hata: " + e.message); }
+};
 
-// Login
-window.login = async () => {
-  const email = document.getElementById("login-email").value.trim();
-  const pass = document.getElementById("login-pass").value.trim();
-  if(!email || !pass) return alert("Email ve şifre girin");
-  try { await signInWithEmailAndPassword(auth, email, pass); } 
-  catch(e) { alert(e.message); }
-}
+switchBtn.onclick = () => {
+    isLoginMode = !isLoginMode;
+    document.getElementById("auth-title").innerText = isLoginMode ? "Hoş Geldiniz" : "Yeni Hesap";
+    loginBtn.innerText = isLoginMode ? "Giriş Yap" : "Kayıt Ol";
+    switchBtn.innerText = isLoginMode ? "Hesap Oluştur" : "Giriş Yap'a Dön";
+};
 
-// Logout
-window.logout = async () => {
-  if(currentUser) await signOut(auth);
-}
+document.getElementById("logout-btn").onclick = () => signOut(auth);
 
-// Add Idea
-window.addIdea = () => {
-  const txt = document.getElementById("idea-input").value.trim();
-  if(!txt || !currentUser) return;
-  const newRef = push(ref(db,"ideas"));
-  set(newRef, {
-    text: txt,
-    author: currentUser.email,
-    timestamp: Date.now()
-  });
-  document.getElementById("idea-input").value = "";
-}
-
-// Delete Idea
-window.deleteIdea = id => {
-  if(confirm("Bu fikri silmek istediğine emin misin?")){
-    remove(ref(db,"ideas/"+id));
-  }
-}
-
-// Load Ideas
-function loadIdeas(){
-  const container = document.getElementById("ideas-container");
-  onValue(ref(db,"ideas"), snap => {
-    container.innerHTML = "";
-    snap.forEach(child => {
-      const data = child.val();
-      const div = document.createElement("div");
-      div.className = "idea-card";
-      div.innerHTML = `
-        <p>${data.text}</p>
-        <small>${data.author}</small>
-        <button onclick="deleteIdea('${child.key}')">Sil</button>
-      `;
-      container.appendChild(div);
+// Logic: Ideas
+document.getElementById("add-idea-btn").onclick = () => {
+    const txt = document.getElementById("idea-input").value.trim();
+    if(!txt) return;
+    push(ref(db, "ideas"), {
+        text: txt,
+        author: auth.currentUser.email,
+        uid: auth.currentUser.uid,
+        time: Date.now()
     });
-  });
-}
+    document.getElementById("idea-input").value = "";
+};
 
-// Add Friend
-window.addFriend = () => {
-  const fEmail = document.getElementById("friend-input").value.trim();
-  if(!fEmail || !currentUser) return;
-  set(ref(db,"friends/"+currentUser.uid+"/"+fEmail.replace(/\./g,'_')), {email: fEmail});
-  document.getElementById("friend-input").value = "";
-}
+window.deleteIdea = (id) => {
+    if(confirm("Silinsin mi?")) remove(ref(db, `ideas/${id}`));
+};
 
-// Load Friends
-function loadFriends(){
-  const list = document.getElementById("friends-list");
-  onValue(ref(db,"friends/"+currentUser.uid), snap => {
-    list.innerHTML = "";
-    snap.forEach(child => {
-      const li = document.createElement("li");
-      li.textContent = child.val().email;
-      list.appendChild(li);
+function loadIdeas() {
+    onValue(ref(db, "ideas"), snap => {
+        const container = document.getElementById("ideas-container");
+        container.innerHTML = "";
+        snap.forEach(child => {
+            const data = child.val();
+            const div = document.createElement("div");
+            div.className = "idea-card";
+            div.innerHTML = `
+                <div>
+                    <p>${data.text}</p>
+                    <small>${data.author}</small>
+                </div>
+                ${data.uid === auth.currentUser.uid ? `<button class="delete-btn" onclick="deleteIdea('${child.key}')"><i class="fas fa-trash"></i></button>` : ''}
+            `;
+            container.prepend(div);
+        });
     });
-  });
+}
+
+// Logic: Friends
+document.getElementById("add-friend-btn").onclick = () => {
+    const email = document.getElementById("friend-input").value.trim();
+    if(!email) return;
+    const cleanEmail = email.replace(/\./g, '_');
+    set(ref(db, `friends/${auth.currentUser.uid}/${cleanEmail}`), { email });
+    document.getElementById("friend-input").value = "";
+};
+
+function loadFriends(uid) {
+    onValue(ref(db, `friends/${uid}`), snap => {
+        const list = document.getElementById("friends-list");
+        list.innerHTML = "";
+        snap.forEach(child => {
+            const li = document.createElement("li");
+            li.style = "padding: 8px; border-bottom: 1px solid var(--border); color: var(--text-dim)";
+            li.innerHTML = `<i class="fas fa-user-circle"></i> ${child.val().email}`;
+            list.appendChild(li);
+        });
+    });
 }
 </script>
-
-<style>
-:root{--bg:#0f172a;--card:#1e293b;--accent:#facc15;--text:#e2e8f0;--radius:12px;--transition:0.3s;}
-body{margin:0;font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);}
-header{display:flex;justify-content:space-between;align-items:center;padding:15px;background:var(--card);border-bottom:1px solid #475569;border-radius:var(--radius);}
-.hamburger{font-size:1.5em;cursor:pointer;}
-.nav-menu{display:none;position:absolute;top:60px;right:10px;background:var(--card);flex-direction:column;width:220px;border-radius:var(--radius);box-shadow:0 4px 15px rgba(0,0,0,0.25);z-index:10;}
-.nav-menu.show{display:flex;}
-.nav-menu a{padding:12px;display:block;color:var(--text);text-decoration:none;}
-.nav-menu a:hover{background:var(--accent);color:#0f172a;}
-.container{max-width:1200px;margin:0 auto;padding:20px;}
-.banner{background:var(--card);height:180px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:1.5em;text-align:center;}
-input,textarea{width:100%;padding:12px;margin-bottom:10px;background:var(--bg);border:1px solid #475569;border-radius:8px;color:var(--text);}
-input:focus,textarea:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px rgba(250,204,21,0.3);}
-button{background:var(--accent);color:#0f172a;padding:12px 20px;border:none;border-radius:8px;cursor:pointer;transition:var(--transition);}
-button:hover{background:#eab308;transform:translateY(-2px);box-shadow:0 4px 12px rgba(250,204,21,0.3);}
-.idea-card{background:var(--card);padding:15px;margin-bottom:12px;border-radius:var(--radius);box-shadow:0 4px 15px rgba(0,0,0,0.25);transition:var(--transition);}
-.idea-card:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 10px 30px rgba(0,0,0,0.4);}
-.help{background:var(--card);border-left:5px solid var(--accent);padding:20px;margin:20px 0;border-radius:var(--radius);}
-@media(max-width:768px){.nav-menu{width:180px;}}
-</style>
-
-</head>
-<body>
-<header>
-  <div>ShareTopt Pro v18 - <span id="user-email"></span></div>
-  <div class="hamburger" onclick="document.querySelector('.nav-menu').classList.toggle('show')">☰</div>
-  <nav class="nav-menu">
-    <a href="#ideas-container">Fikirler</a>
-    <a href="#friends-section">Arkadaşlar</a>
-    <a href="#help-section">Yardım</a>
-    <a href="#" onclick="logout()">Çıkış Yap</a>
-  </nav>
-</header>
-
-<div class="container">
-  <div id="auth">
-    <h2>Kayıt / Giriş</h2>
-    <input type="email" id="reg-email" placeholder="Email">
-    <input type="password" id="reg-pass" placeholder="Şifre">
-    <button onclick="register()">Kayıt Ol</button>
-    <hr>
-    <input type="email" id="login-email" placeholder="Email">
-    <input type="password" id="login-pass" placeholder="Şifre">
-    <button onclick="login()">Giriş Yap</button>
-  </div>
-
-  <div id="app" style="display:none;">
-    <div class="banner">Fikirlerinizi Paylaşın</div>
-
-    <input type="text" id="idea-input" placeholder="Fikrinizi yazın">
-    <button onclick="addIdea()">Fikri Ekle</button>
-    <div id="ideas-container"></div>
-
-    <section id="friends-section">
-      <h3>Arkadaş Ekle</h3>
-      <input type="email" id="friend-input" placeholder="Email girin">
-      <button onclick="addFriend()">Ekle</button>
-      <ul id="friends-list"></ul>
-    </section>
-
-    <section class="help" id="help-section">
-      <h3>Yardım / Öğretici</h3>
-      <p>Fikir eklemek için yazıp "Fikri Ekle" butonuna basın.</p>
-      <p>Arkadaş eklemek için email girip "Ekle" butonuna tıklayın.</p>
-      <p>Fikirleri silmek için "Sil" butonuna basın.</p>
-      <p>Çıkış yapmak için hamburger menüden "Çıkış Yap" seçeneğine tıklayın.</p>
-    </section>
-  </div>
-</div>
 </body>
-  </html>
+</html>
