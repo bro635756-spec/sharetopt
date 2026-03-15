@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShareTopt Connect - Elite</title>
+    <title>ShareTopt Connect - Fix</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -13,7 +13,7 @@
             --bg: #020308;
             --card: rgba(13, 17, 30, 0.9);
             --accent: #a855f7;
-            --accent-glow: rgba(168, 85, 247, 0.3);
+            --success: #22c55e;
             --border: rgba(255, 255, 255, 0.08);
             --text: #ffffff;
             --radius: 20px;
@@ -23,36 +23,30 @@
         body { background: var(--bg); color: var(--text); min-height: 100vh; }
 
         .glass { background: var(--card); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
-        input, textarea { width: 100%; padding: 14px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 12px; color: white; margin-bottom: 12px; transition: 0.3s; }
-        input:focus { border-color: var(--accent); outline: none; }
-        button { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; width: 100%; }
-        button:active { transform: scale(0.98); }
+        input { width: 100%; padding: 14px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 12px; color: white; margin-bottom: 12px; }
+        button { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; }
 
         /* ID Copy Styling */
-        .id-container {
+        .id-box {
             font-family: 'JetBrains Mono', monospace;
-            background: linear-gradient(90deg, rgba(168, 85, 247, 0.1), rgba(0,0,0,0));
-            border-left: 3px solid var(--accent);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 0.68rem;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px dashed var(--accent);
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 0.7rem;
             word-break: break-all;
             color: var(--accent);
             cursor: pointer;
-            position: relative;
-            transition: 0.3s;
+            text-align: center;
             margin: 15px 0;
+            transition: 0.3s;
         }
-        .id-container:hover { background: rgba(168, 85, 247, 0.15); }
-        .id-container::after { content: 'Kopyalamak için tıkla'; position: absolute; bottom: -18px; left: 0; font-size: 0.6rem; opacity: 0.6; }
+        .id-box:active { transform: scale(0.95); background: rgba(34, 197, 94, 0.1); }
 
-        /* Messaging UI */
         .chat-item { display: flex; align-items: center; gap: 12px; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; }
-        .avatar { width: 45px; height: 45px; border-radius: 14px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; }
-
         .dm-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: none; flex-direction: column; }
         .chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 12px 16px; border-radius: 18px; max-width: 80%; font-size: 0.9rem; }
+        .msg { padding: 12px 16px; border-radius: 18px; max-width: 80%; }
         .sent { align-self: flex-end; background: var(--accent); }
         .received { align-self: flex-start; background: #1e293b; }
 
@@ -60,8 +54,6 @@
         .nav-btn { color: #4b5563; font-size: 1.4rem; cursor: pointer; }
         .nav-btn.active { color: var(--accent); }
 
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .modal.active { display: flex; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -69,16 +61,16 @@
 
 <header style="padding: 1.2rem; display: flex; justify-content: space-between; align-items: center;">
     <div style="font-weight: 800; color: var(--accent);">SHARETOPT</div>
-    <i class="fas fa-plus-circle" onclick="toggleModal(true)" style="color: var(--accent); font-size: 1.3rem; cursor: pointer;"></i>
+    <i class="fas fa-user-plus" onclick="document.getElementById('friend-modal').classList.add('active')" style="color: var(--accent); cursor: pointer;"></i>
 </header>
 
 <div class="container" style="max-width: 450px; margin: auto; padding: 10px 15px 100px 15px;">
     <div id="auth-box" class="glass">
-        <h2 style="text-align:center; margin-bottom:20px">Giriş</h2>
+        <h2 style="text-align:center; margin-bottom:20px">Giriş / Kayıt</h2>
         <input type="email" id="email" placeholder="E-posta">
         <input type="password" id="pass" placeholder="Şifre">
-        <button id="auth-btn">Devam Et</button>
-        <p id="auth-switch" style="text-align:center; margin-top:15px; font-size:0.8rem; cursor:pointer; opacity:0.6">Hesap oluştur</p>
+        <button id="auth-btn">Giriş Yap / Devam Et</button>
+        <p id="auth-switch" style="text-align:center; margin-top:15px; font-size:0.8rem; cursor:pointer; opacity:0.6">Yeni Hesap Oluştur</p>
     </div>
 
     <div id="msg-tab">
@@ -87,49 +79,49 @@
 
     <div id="profile-tab" class="hidden">
         <div class="glass" style="text-align: center;">
-            <img id="p-img" src="" style="width:90px; height:90px; border-radius:50%; border:2px solid var(--accent);">
-            <h2 id="p-name-view" style="margin-top:10px">İsim</h2>
+            <img id="p-img" src="" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--accent); margin-bottom:10px">
+            <h2 id="p-name-view">...</h2>
             
-            <div class="id-container" id="my-id-display" onclick="copyMyId()">
-                SJ-v_191-h241s...
+            <div class="id-box" id="my-id-display" onclick="copyIdDirectly()">
+                ID Yükleniyor...
             </div>
-            
-            <p id="p-bio-view" style="color:#9ca3af; font-size:0.85rem; margin-top:10px"></p>
+            <small style="opacity:0.5; font-size:0.6rem">Kopyalamak için ID'ye dokun</small>
+
+            <p id="p-bio-view" style="color:#9ca3af; font-size:0.85rem; margin-top:15px"></p>
         </div>
 
         <div class="glass">
-            <h4>Profili Düzenle</h4>
-            <input type="text" id="edit-name" placeholder="Takma Ad">
-            <textarea id="edit-bio" placeholder="Hakkımda..."></textarea>
-            <button id="save-profile">Bilgileri Güncelle</button>
+            <input type="text" id="edit-name" placeholder="İsim Değiştir">
+            <textarea id="edit-bio" placeholder="Hakkında..." style="width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:12px; color:white; padding:10px;"></textarea>
+            <button id="save-profile" style="margin-top:10px">Güncelle</button>
         </div>
-        <button onclick="logout()" style="background:#1f2937">Çıkış Yap</button>
+        <button onclick="signOut(auth)" style="background:#1f2937">Çıkış</button>
     </div>
 </div>
 
-<div class="modal" id="friend-modal">
+<div class="modal" id="friend-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:3000; display:none; align-items:center; justify-content:center; padding:20px;">
     <div class="glass" style="width:100%; max-width:320px">
-        <h3 style="margin-bottom:15px">Arkadaş Ekle</h3>
+        <h3>Arkadaş Ekle</h3>
         <input type="text" id="f-id-input" placeholder="SJ-v_191-h241s...">
         <button id="f-add-btn">Ekle</button>
-        <button onclick="toggleModal(false)" style="background:transparent; color:#9ca3af; margin-top:10px">Kapat</button>
+        <button onclick="document.getElementById('friend-modal').classList.remove('active')" style="background:transparent; color:#9ca3af; margin-top:10px">Kapat</button>
     </div>
 </div>
 
 <div id="dm-view" class="dm-overlay">
     <div style="padding:15px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:15px">
-        <i class="fas fa-arrow-left" onclick="closeDM()" style="cursor:pointer"></i>
+        <i class="fas fa-arrow-left" onclick="document.getElementById('dm-view').style.display='none'"></i>
         <span id="dm-title" style="font-weight:700"></span>
     </div>
     <div class="chat-area" id="chat-msgs"></div>
     <div style="padding:15px; display:flex; gap:10px; background: #0d111e">
-        <input type="text" id="dm-input" placeholder="Mesaj yaz..." style="margin-bottom:0">
-        <button id="dm-send" style="width:50px"><i class="fas fa-paper-plane"></i></button>
+        <input type="text" id="dm-input" placeholder="Mesaj..." style="margin-bottom:0">
+        <button id="dm-send" style="width:60px"><i class="fas fa-paper-plane"></i></button>
     </div>
 </div>
 
 <nav id="navbar" class="hidden">
-    <div class="nav-btn active" onclick="showTab('msg', this)"><i class="fas fa-comment-alt"></i></div>
+    <div class="nav-btn active" onclick="showTab('msg', this)"><i class="fas fa-comment"></i></div>
     <div class="nav-btn" onclick="showTab('profile', this)"><i class="fas fa-user"></i></div>
 </nav>
 
@@ -149,23 +141,27 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-let myData = null, isLogin = true, currentFriendId = null;
+let myData = null, isLogin = true, activeFriend = null;
 
-// ID Üretici: SJ-v_191-h241sxxxxxxxxxxxxx_1qqxxxxxxx
-const genId = () => {
-    const s1 = Math.random().toString(36).substring(2, 15);
-    const s2 = Math.random().toString(36).substring(2, 12);
-    return `SJ-v_191-h241s${s1}_1qq${s2}`;
+// ID Üretici
+const generateEliteId = () => {
+    const r = () => Math.random().toString(36).substring(2, 10);
+    return `SJ-v_191-h241s${r()}_1qq${r()}`;
 };
 
 onAuthStateChanged(auth, async (user) => {
     if(user) {
-        const s = await get(ref(db, `users/${user.uid}`));
-        myData = s.val();
+        onValue(ref(db, `users/${user.uid}`), (s) => {
+            myData = s.val();
+            if(myData) {
+                document.getElementById('my-id-display').innerText = myData.customId;
+                document.getElementById('p-name-view').innerText = myData.name;
+                document.getElementById('p-bio-view').innerText = myData.bio || "";
+                document.getElementById('p-img').src = myData.img;
+            }
+        });
         document.getElementById('auth-box').classList.add('hidden');
         document.getElementById('navbar').classList.remove('hidden');
-        document.getElementById('my-id-display').innerText = myData.customId;
-        loadProfile();
         loadFriends();
     } else {
         document.getElementById('auth-box').classList.remove('hidden');
@@ -179,20 +175,32 @@ document.getElementById('auth-btn').onclick = async () => {
         if(isLogin) await signInWithEmailAndPassword(auth, e, p);
         else {
             const res = await createUserWithEmailAndPassword(auth, e, p);
-            const cid = genId();
-            await set(ref(db, `users/${res.user.uid}`), { customId: cid, name: "Üye", bio: "Merhaba!", img: `https://api.dicebear.com/7.x/pixel-art/svg?seed=${cid}` });
+            const newId = generateEliteId();
+            await set(ref(db, `users/${res.user.uid}`), { 
+                customId: newId, 
+                name: "Yeni Kullanıcı", 
+                bio: "ShareTopt Connect kullanıyor.",
+                img: `https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${newId}`
+            });
         }
-    } catch(err) { alert(err.message); }
+    } catch(err) { alert("Hata: " + err.message); }
 };
 
-function loadProfile() {
-    onValue(ref(db, `users/${auth.currentUser.uid}`), (s) => {
-        const d = s.val();
-        document.getElementById('p-name-view').innerText = d.name;
-        document.getElementById('p-bio-view').innerText = d.bio;
-        document.getElementById('p-img').src = d.img;
+window.copyIdDirectly = () => {
+    const idText = document.getElementById('my-id-display').innerText;
+    if(idText.includes("...")) return; // Yüklenmediyse kopyalama
+    
+    navigator.clipboard.writeText(idText).then(() => {
+        const box = document.getElementById('my-id-display');
+        const oldColor = box.style.borderColor;
+        box.style.borderColor = "#22c55e";
+        box.innerText = "KOPYALANDI!";
+        setTimeout(() => {
+            box.style.borderColor = oldColor;
+            box.innerText = idText;
+        }, 1500);
     });
-}
+};
 
 document.getElementById('save-profile').onclick = () => {
     const n = document.getElementById('edit-name').value;
@@ -202,16 +210,6 @@ document.getElementById('save-profile').onclick = () => {
     alert("Profil güncellendi!");
 };
 
-window.copyMyId = () => {
-    navigator.clipboard.writeText(myData.customId);
-    const box = document.getElementById('my-id-display');
-    box.style.borderColor = "#22c55e";
-    setTimeout(() => box.style.borderColor = "var(--accent)", 2000);
-    alert("ID Kopyalandı!");
-};
-
-window.toggleModal = (show) => document.getElementById('friend-modal').classList.toggle('active', show);
-
 document.getElementById('f-add-btn').onclick = async () => {
     const fid = document.getElementById('f-id-input').value.trim();
     const q = query(ref(db, "users"), orderByChild("customId"), equalTo(fid));
@@ -219,28 +217,28 @@ document.getElementById('f-add-btn').onclick = async () => {
     if(s.exists()) {
         const f = Object.values(s.val())[0];
         await set(ref(db, `friends/${auth.currentUser.uid}/${fid.replace(/[^a-z0-9]/gi,'')}`), { id: fid, name: f.name });
-        alert("Arkadaş eklendi!");
-        toggleModal(false);
-    } else alert("Geçersiz ID!");
+        alert("Eklendi!");
+        document.getElementById('friend-modal').classList.remove('active');
+    } else alert("ID bulunamadı!");
 };
 
 function loadFriends() {
     onValue(ref(db, `friends/${auth.currentUser.uid}`), (s) => {
-        const list = document.getElementById('chat-list');
-        list.innerHTML = "";
+        const list = document.getElementById('chat-list'); list.innerHTML = "";
         s.forEach(c => {
             const d = c.val();
             const div = document.createElement('div');
             div.className = "chat-item";
-            div.innerHTML = `<div class="avatar">${d.name[0]}</div><div><strong>${d.name}</strong><br><small style="opacity:0.5">${d.id.substring(0,15)}...</small></div>`;
-            div.onclick = () => openDM(d.id, d.name);
+            div.innerHTML = `<div style="width:40px; height:40px; background:var(--accent); border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:bold">${d.name[0]}</div>
+                             <div><strong>${d.name}</strong><br><small style="opacity:0.4">${d.id.substring(0,12)}...</small></div>`;
+            div.onclick = () => openChat(d.id, d.name);
             list.appendChild(div);
         });
     });
 }
 
-window.openDM = (fid, fname) => {
-    currentFriendId = fid;
+function openChat(fid, fname) {
+    activeFriend = fid;
     document.getElementById('dm-view').style.display = 'flex';
     document.getElementById('dm-title').innerText = fname;
     const room = [myData.customId, fid].sort().join("_");
@@ -248,24 +246,21 @@ window.openDM = (fid, fname) => {
         const area = document.getElementById('chat-msgs'); area.innerHTML = "";
         s.forEach(c => {
             const m = c.val();
-            const div = document.createElement('div');
-            div.className = `msg ${m.sender === myData.customId ? 'sent' : 'received'}`;
-            div.innerText = m.text;
-            area.appendChild(div);
+            const d = document.createElement('div');
+            d.className = `msg ${m.sender === myData.customId ? 'sent' : 'received'}`;
+            d.innerText = m.text;
+            area.appendChild(d);
         });
         area.scrollTop = area.scrollHeight;
     });
-};
+}
 
 document.getElementById('dm-send').onclick = () => {
-    const t = document.getElementById('dm-input').value;
-    if(!t) return;
-    const room = [myData.customId, currentFriendId].sort().join("_");
+    const t = document.getElementById('dm-input').value; if(!t) return;
+    const room = [myData.customId, activeFriend].sort().join("_");
     push(ref(db, `chats/${room}`), { sender: myData.customId, text: t, time: serverTimestamp() });
     document.getElementById('dm-input').value = "";
 };
-
-window.closeDM = () => document.getElementById('dm-view').style.display = 'none';
 
 window.showTab = (tab, el) => {
     document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -274,12 +269,11 @@ window.showTab = (tab, el) => {
     document.getElementById('profile-tab').className = tab === 'profile' ? '' : 'hidden';
 };
 
-window.logout = () => signOut(auth);
 document.getElementById('auth-switch').onclick = () => {
     isLogin = !isLogin;
-    document.getElementById('auth-btn').innerText = isLogin ? "Giriş" : "Kayıt";
+    document.getElementById('auth-btn').innerText = isLogin ? "Giriş Yap" : "Hesap Oluştur";
 };
 </script>
 </body>
-        </html>
-                
+    </html>
+    
