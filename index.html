@@ -1,279 +1,511 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShareTopt Connect - Fix</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        :root {
-            --bg: #020308;
-            --card: rgba(13, 17, 30, 0.9);
-            --accent: #a855f7;
-            --success: #22c55e;
-            --border: rgba(255, 255, 255, 0.08);
-            --text: #ffffff;
-            --radius: 20px;
-        }
+<title>ShareTopt PRO</title>
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background: var(--bg); color: var(--text); min-height: 100vh; }
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700&display=swap" rel="stylesheet">
 
-        .glass { background: var(--card); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
-        input { width: 100%; padding: 14px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 12px; color: white; margin-bottom: 12px; }
-        button { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; }
+<style>
 
-        /* ID Copy Styling */
-        .id-box {
-            font-family: 'JetBrains Mono', monospace;
-            background: rgba(168, 85, 247, 0.1);
-            border: 1px dashed var(--accent);
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 0.7rem;
-            word-break: break-all;
-            color: var(--accent);
-            cursor: pointer;
-            text-align: center;
-            margin: 15px 0;
-            transition: 0.3s;
-        }
-        .id-box:active { transform: scale(0.95); background: rgba(34, 197, 94, 0.1); }
+body{
+margin:0;
+background:#0b0f1a;
+color:white;
+font-family:'Plus Jakarta Sans',sans-serif;
+}
 
-        .chat-item { display: flex; align-items: center; gap: 12px; padding: 15px; border-bottom: 1px solid var(--border); cursor: pointer; }
-        .dm-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: none; flex-direction: column; }
-        .chat-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 12px 16px; border-radius: 18px; max-width: 80%; }
-        .sent { align-self: flex-end; background: var(--accent); }
-        .received { align-self: flex-start; background: #1e293b; }
+header{
+display:flex;
+justify-content:space-between;
+padding:15px;
+background:#111827;
+}
 
-        nav { position: fixed; bottom: 0; width: 100%; background: #0d111e; display: flex; justify-content: space-around; padding: 20px; border-top: 1px solid var(--border); }
-        .nav-btn { color: #4b5563; font-size: 1.4rem; cursor: pointer; }
-        .nav-btn.active { color: var(--accent); }
+.container{
+max-width:500px;
+margin:auto;
+padding-bottom:90px;
+}
 
-        .hidden { display: none !important; }
-    </style>
+.card{
+background:#111827;
+padding:20px;
+margin:15px;
+border-radius:15px;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-bottom:10px;
+background:#0b0f1a;
+border:1px solid #222;
+color:white;
+border-radius:10px;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#8b5cf6;
+border:none;
+color:white;
+border-radius:10px;
+font-weight:bold;
+}
+
+.chat-item{
+padding:15px;
+border-bottom:1px solid #222;
+cursor:pointer;
+}
+
+.msg{
+padding:10px 14px;
+border-radius:15px;
+max-width:70%;
+margin:6px;
+}
+
+.sent{
+background:#8b5cf6;
+margin-left:auto;
+}
+
+.received{
+background:#1f2937;
+}
+
+nav{
+position:fixed;
+bottom:0;
+width:100%;
+background:#111827;
+display:flex;
+justify-content:space-around;
+padding:15px;
+}
+
+.hidden{
+display:none;
+}
+
+.story{
+display:inline-block;
+width:60px;
+height:60px;
+border-radius:50%;
+border:3px solid #8b5cf6;
+margin-right:10px;
+}
+
+.typing{
+font-size:12px;
+opacity:.6;
+}
+
+</style>
 </head>
+
 <body>
 
-<header style="padding: 1.2rem; display: flex; justify-content: space-between; align-items: center;">
-    <div style="font-weight: 800; color: var(--accent);">SHARETOPT</div>
-    <i class="fas fa-user-plus" onclick="document.getElementById('friend-modal').classList.add('active')" style="color: var(--accent); cursor: pointer;"></i>
+<header>
+
+<div>ShareTopt</div>
+
+<div onclick="openCommunity()">🌍</div>
+
 </header>
 
-<div class="container" style="max-width: 450px; margin: auto; padding: 10px 15px 100px 15px;">
-    <div id="auth-box" class="glass">
-        <h2 style="text-align:center; margin-bottom:20px">Giriş / Kayıt</h2>
-        <input type="email" id="email" placeholder="E-posta">
-        <input type="password" id="pass" placeholder="Şifre">
-        <button id="auth-btn">Giriş Yap / Devam Et</button>
-        <p id="auth-switch" style="text-align:center; margin-top:15px; font-size:0.8rem; cursor:pointer; opacity:0.6">Yeni Hesap Oluştur</p>
-    </div>
 
-    <div id="msg-tab">
-        <div id="chat-list"></div>
-    </div>
+<div class="container">
 
-    <div id="profile-tab" class="hidden">
-        <div class="glass" style="text-align: center;">
-            <img id="p-img" src="" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--accent); margin-bottom:10px">
-            <h2 id="p-name-view">...</h2>
-            
-            <div class="id-box" id="my-id-display" onclick="copyIdDirectly()">
-                ID Yükleniyor...
-            </div>
-            <small style="opacity:0.5; font-size:0.6rem">Kopyalamak için ID'ye dokun</small>
+<!-- AUTH -->
 
-            <p id="p-bio-view" style="color:#9ca3af; font-size:0.85rem; margin-top:15px"></p>
-        </div>
+<div id="auth-box" class="card">
 
-        <div class="glass">
-            <input type="text" id="edit-name" placeholder="İsim Değiştir">
-            <textarea id="edit-bio" placeholder="Hakkında..." style="width:100%; background:rgba(0,0,0,0.5); border:1px solid var(--border); border-radius:12px; color:white; padding:10px;"></textarea>
-            <button id="save-profile" style="margin-top:10px">Güncelle</button>
-        </div>
-        <button onclick="signOut(auth)" style="background:#1f2937">Çıkış</button>
-    </div>
+<input id="email" placeholder="email">
+
+<input id="pass" type="password" placeholder="password">
+
+<button id="auth-btn">Giriş / Kayıt</button>
+
 </div>
 
-<div class="modal" id="friend-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:3000; display:none; align-items:center; justify-content:center; padding:20px;">
-    <div class="glass" style="width:100%; max-width:320px">
-        <h3>Arkadaş Ekle</h3>
-        <input type="text" id="f-id-input" placeholder="SJ-v_191-h241s...">
-        <button id="f-add-btn">Ekle</button>
-        <button onclick="document.getElementById('friend-modal').classList.remove('active')" style="background:transparent; color:#9ca3af; margin-top:10px">Kapat</button>
-    </div>
+
+<!-- STORY -->
+
+<div id="story-bar" style="overflow:auto;white-space:nowrap;padding:10px"></div>
+
+
+<!-- CHAT LIST -->
+
+<div id="chat-list"></div>
+
+
+<!-- COMMUNITY -->
+
+<div id="community" class="hidden card">
+
+<h3>Topluluk</h3>
+
+<div id="posts"></div>
+
+<input id="post-input" placeholder="Bir şey paylaş">
+
+<button onclick="sharePost()">Paylaş</button>
+
 </div>
 
-<div id="dm-view" class="dm-overlay">
-    <div style="padding:15px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:15px">
-        <i class="fas fa-arrow-left" onclick="document.getElementById('dm-view').style.display='none'"></i>
-        <span id="dm-title" style="font-weight:700"></span>
-    </div>
-    <div class="chat-area" id="chat-msgs"></div>
-    <div style="padding:15px; display:flex; gap:10px; background: #0d111e">
-        <input type="text" id="dm-input" placeholder="Mesaj..." style="margin-bottom:0">
-        <button id="dm-send" style="width:60px"><i class="fas fa-paper-plane"></i></button>
-    </div>
+
 </div>
 
-<nav id="navbar" class="hidden">
-    <div class="nav-btn active" onclick="showTab('msg', this)"><i class="fas fa-comment"></i></div>
-    <div class="nav-btn" onclick="showTab('profile', this)"><i class="fas fa-user"></i></div>
+
+<!-- CHAT -->
+
+<div id="chat-screen" class="hidden">
+
+<header>
+
+<span id="chat-name"></span>
+
+<span onclick="closeChat()">X</span>
+
+</header>
+
+<div id="chat-messages" style="height:60vh;overflow:auto"></div>
+
+<div class="typing" id="typing"></div>
+
+<div style="display:flex">
+
+<input id="msg">
+
+<button onclick="sendMsg()">➤</button>
+
+</div>
+
+</div>
+
+
+<nav>
+
+<div onclick="showChats()">💬</div>
+
+<div onclick="showProfile()">👤</div>
+
 </nav>
 
+
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getDatabase, ref, push, set, onValue, serverTimestamp, query, orderByChild, equalTo, get } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-const firebaseConfig = {
-    apiKey: "AIzaSyAFtCQjGACAmoOSEIazC648I1BaLPkT8-U",
-    authDomain: "share-your-thoughts-e15a7.firebaseapp.com",
-    databaseURL: "https://share-your-thoughts-e15a7-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "share-your-thoughts-e15a7",
-};
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js"
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const auth = getAuth(app);
+import {getDatabase,ref,set,onValue,push,remove,query,orderByChild,equalTo,get} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js"
 
-let myData = null, isLogin = true, activeFriend = null;
+import {getAuth,createUserWithEmailAndPassword,signInWithEmailAndPassword,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js"
 
-// ID Üretici
-const generateEliteId = () => {
-    const r = () => Math.random().toString(36).substring(2, 10);
-    return `SJ-v_191-h241s${r()}_1qq${r()}`;
-};
 
-onAuthStateChanged(auth, async (user) => {
-    if(user) {
-        onValue(ref(db, `users/${user.uid}`), (s) => {
-            myData = s.val();
-            if(myData) {
-                document.getElementById('my-id-display').innerText = myData.customId;
-                document.getElementById('p-name-view').innerText = myData.name;
-                document.getElementById('p-bio-view').innerText = myData.bio || "";
-                document.getElementById('p-img').src = myData.img;
-            }
-        });
-        document.getElementById('auth-box').classList.add('hidden');
-        document.getElementById('navbar').classList.remove('hidden');
-        loadFriends();
-    } else {
-        document.getElementById('auth-box').classList.remove('hidden');
-        document.getElementById('navbar').classList.add('hidden');
-    }
-});
 
-document.getElementById('auth-btn').onclick = async () => {
-    const e = document.getElementById('email').value, p = document.getElementById('pass').value;
-    try {
-        if(isLogin) await signInWithEmailAndPassword(auth, e, p);
-        else {
-            const res = await createUserWithEmailAndPassword(auth, e, p);
-            const newId = generateEliteId();
-            await set(ref(db, `users/${res.user.uid}`), { 
-                customId: newId, 
-                name: "Yeni Kullanıcı", 
-                bio: "ShareTopt Connect kullanıyor.",
-                img: `https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${newId}`
-            });
-        }
-    } catch(err) { alert("Hata: " + err.message); }
-};
+const firebaseConfig={
 
-window.copyIdDirectly = () => {
-    const idText = document.getElementById('my-id-display').innerText;
-    if(idText.includes("...")) return; // Yüklenmediyse kopyalama
-    
-    navigator.clipboard.writeText(idText).then(() => {
-        const box = document.getElementById('my-id-display');
-        const oldColor = box.style.borderColor;
-        box.style.borderColor = "#22c55e";
-        box.innerText = "KOPYALANDI!";
-        setTimeout(() => {
-            box.style.borderColor = oldColor;
-            box.innerText = idText;
-        }, 1500);
-    });
-};
+apiKey:"AIzaSyAFtCQjGACAmoOSEIazC648I1BaLPkT8-U",
 
-document.getElementById('save-profile').onclick = () => {
-    const n = document.getElementById('edit-name').value;
-    const b = document.getElementById('edit-bio').value;
-    if(n) set(ref(db, `users/${auth.currentUser.uid}/name`), n);
-    if(b) set(ref(db, `users/${auth.currentUser.uid}/bio`), b);
-    alert("Profil güncellendi!");
-};
+authDomain:"share-your-thoughts-e15a7.firebaseapp.com",
 
-document.getElementById('f-add-btn').onclick = async () => {
-    const fid = document.getElementById('f-id-input').value.trim();
-    const q = query(ref(db, "users"), orderByChild("customId"), equalTo(fid));
-    const s = await get(q);
-    if(s.exists()) {
-        const f = Object.values(s.val())[0];
-        await set(ref(db, `friends/${auth.currentUser.uid}/${fid.replace(/[^a-z0-9]/gi,'')}`), { id: fid, name: f.name });
-        alert("Eklendi!");
-        document.getElementById('friend-modal').classList.remove('active');
-    } else alert("ID bulunamadı!");
-};
+databaseURL:"https://share-your-thoughts-e15a7-default-rtdb.europe-west1.firebasedatabase.app",
 
-function loadFriends() {
-    onValue(ref(db, `friends/${auth.currentUser.uid}`), (s) => {
-        const list = document.getElementById('chat-list'); list.innerHTML = "";
-        s.forEach(c => {
-            const d = c.val();
-            const div = document.createElement('div');
-            div.className = "chat-item";
-            div.innerHTML = `<div style="width:40px; height:40px; background:var(--accent); border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:bold">${d.name[0]}</div>
-                             <div><strong>${d.name}</strong><br><small style="opacity:0.4">${d.id.substring(0,12)}...</small></div>`;
-            div.onclick = () => openChat(d.id, d.name);
-            list.appendChild(div);
-        });
-    });
+projectId:"share-your-thoughts-e15a7"
+
 }
 
-function openChat(fid, fname) {
-    activeFriend = fid;
-    document.getElementById('dm-view').style.display = 'flex';
-    document.getElementById('dm-title').innerText = fname;
-    const room = [myData.customId, fid].sort().join("_");
-    onValue(ref(db, `chats/${room}`), (s) => {
-        const area = document.getElementById('chat-msgs'); area.innerHTML = "";
-        s.forEach(c => {
-            const m = c.val();
-            const d = document.createElement('div');
-            d.className = `msg ${m.sender === myData.customId ? 'sent' : 'received'}`;
-            d.innerText = m.text;
-            area.appendChild(d);
-        });
-        area.scrollTop = area.scrollHeight;
-    });
+
+
+const app=initializeApp(firebaseConfig)
+
+const db=getDatabase(app)
+
+const auth=getAuth(app)
+
+
+
+let myData=null
+let activeFriend=null
+
+
+
+function genID(){
+
+return "SJ-"+Math.random().toString(36).substring(2,12)
+
 }
 
-document.getElementById('dm-send').onclick = () => {
-    const t = document.getElementById('dm-input').value; if(!t) return;
-    const room = [myData.customId, activeFriend].sort().join("_");
-    push(ref(db, `chats/${room}`), { sender: myData.customId, text: t, time: serverTimestamp() });
-    document.getElementById('dm-input').value = "";
-};
 
-window.showTab = (tab, el) => {
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('msg-tab').className = tab === 'msg' ? '' : 'hidden';
-    document.getElementById('profile-tab').className = tab === 'profile' ? '' : 'hidden';
-};
 
-document.getElementById('auth-switch').onclick = () => {
-    isLogin = !isLogin;
-    document.getElementById('auth-btn').innerText = isLogin ? "Giriş Yap" : "Hesap Oluştur";
-};
+document.getElementById("auth-btn").onclick=async()=>{
+
+const e=email.value
+const p=pass.value
+
+try{
+
+await signInWithEmailAndPassword(auth,e,p)
+
+}catch{
+
+const res=await createUserWithEmailAndPassword(auth,e,p)
+
+const id=genID()
+
+await set(ref(db,"users/"+res.user.uid),{
+
+name:"Yeni",
+
+customId:id
+
+})
+
+}
+
+}
+
+
+
+onAuthStateChanged(auth,user=>{
+
+if(!user)return
+
+set(ref(db,"online/"+user.uid),true)
+
+onValue(ref(db,"users/"+user.uid),s=>{
+
+myData=s.val()
+
+})
+
+loadFriends()
+
+loadStories()
+
+loadPosts()
+
+})
+
+
+
+function loadFriends(){
+
+onValue(ref(db,"users"),snap=>{
+
+chat-list.innerHTML=""
+
+snap.forEach(c=>{
+
+const d=c.val()
+
+if(d.customId===myData.customId)return
+
+const div=document.createElement("div")
+
+div.className="chat-item"
+
+div.innerText=d.name
+
+div.onclick=()=>openChat(d)
+
+chat-list.appendChild(div)
+
+})
+
+})
+
+}
+
+
+
+function openChat(friend){
+
+activeFriend=friend
+
+chat-name.innerText=friend.name
+
+chat-screen.classList.remove("hidden")
+
+
+
+const room=[myData.customId,friend.customId].sort().join("_")
+
+
+
+onValue(ref(db,"chats/"+room),snap=>{
+
+chat-messages.innerHTML=""
+
+snap.forEach(c=>{
+
+const m=c.val()
+
+const div=document.createElement("div")
+
+div.className="msg "+(m.sender===myData.customId?"sent":"received")
+
+div.innerText=m.text
+
+div.onclick=()=>{
+
+if(m.sender===myData.customId){
+
+remove(ref(db,"chats/"+room+"/"+c.key))
+
+}
+
+}
+
+chat-messages.appendChild(div)
+
+})
+
+})
+
+}
+
+
+
+function sendMsg(){
+
+const t=msg.value
+
+if(!t)return
+
+
+
+const room=[myData.customId,activeFriend.customId].sort().join("_")
+
+
+
+push(ref(db,"chats/"+room),{
+
+sender:myData.customId,
+
+text:t
+
+})
+
+
+
+msg.value=""
+
+
+
+set(ref(db,"typing/"+room),myData.name)
+
+
+
+setTimeout(()=>{
+
+remove(ref(db,"typing/"+room))
+
+},2000)
+
+}
+
+
+
+function loadPosts(){
+
+onValue(ref(db,"community"),snap=>{
+
+posts.innerHTML=""
+
+snap.forEach(c=>{
+
+const d=c.val()
+
+const div=document.createElement("div")
+
+div.innerText=d.user+" : "+d.text
+
+posts.appendChild(div)
+
+})
+
+})
+
+}
+
+
+
+function sharePost(){
+
+push(ref(db,"community"),{
+
+user:myData.name,
+
+text:post-input.value
+
+})
+
+post-input.value=""
+
+}
+
+
+
+function loadStories(){
+
+onValue(ref(db,"stories"),snap=>{
+
+story-bar.innerHTML=""
+
+snap.forEach(c=>{
+
+const d=c.val()
+
+const img=document.createElement("div")
+
+img.className="story"
+
+img.onclick=()=>alert(d.text)
+
+story-bar.appendChild(img)
+
+})
+
+})
+
+}
+
+
+
+function openCommunity(){
+
+community.classList.toggle("hidden")
+
+}
+
+
+
+function showChats(){
+
+community.classList.add("hidden")
+
+}
+
+
+
+function showProfile(){
+
+alert("profil ekranı geliştirilebilir")
+
+}
+
+
+
 </script>
+
 </body>
     </html>
-    
