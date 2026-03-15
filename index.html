@@ -1,277 +1,377 @@
+v_192
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShareTopt Pro v18 - Ultra</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>ShareTopt Pro v18 - Aurora</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
-        :root { --bg: #05080f; --card: #111827; --accent: #6366f1; --border: #1f2937; --text: #f3f4f6; --radius: 16px; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text); overflow-x: hidden; }
+        :root {
+            --bg: #05060f;
+            --card: rgba(17, 24, 39, 0.7);
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #f9fafb;
+            --text-dim: #9ca3af;
+            --radius: 24px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
         
-        /* Layout */
-        header { position: sticky; top: 0; z-index: 1000; background: rgba(5, 8, 15, 0.8); backdrop-filter: blur(10px); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-        .container { max-width: 600px; margin: 20px auto; padding-bottom: 80px; }
-        .glass { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+        body { 
+            background: var(--bg); 
+            background-image: radial-gradient(circle at 50% -20%, #1e1b4b 0%, var(--bg) 80%);
+            color: var(--text); 
+            min-height: 100vh;
+            padding-bottom: 90px;
+        }
+
+        /* --- Header --- */
+        header {
+            position: sticky; top: 0; z-index: 1000;
+            padding: 1.2rem 5%;
+            background: rgba(5, 6, 15, 0.6);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { font-weight: 800; font-size: 1.4rem; letter-spacing: -1px; background: linear-gradient(to right, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* --- Container & Cards --- */
+        .container { max-width: 480px; margin: 20px auto; padding: 0 15px; }
         
-        /* Profile UI */
-        .profile-header { text-align: center; }
-        .p-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); margin-bottom: 10px; }
-        .mono { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--accent); }
-        
-        /* DM & Posts */
-        .feed-card { overflow: hidden; }
-        .feed-img, .feed-vid { width: 100%; border-radius: 12px; margin: 10px 0; max-height: 400px; object-fit: cover; }
-        .dm-window { position: fixed; bottom: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 2000; display: none; flex-direction: column; }
-        .dm-header { padding: 15px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
-        .chat-area { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        
-        /* UI Components */
-        input, textarea { width: 100%; padding: 12px; background: #000; border: 1px solid var(--border); border-radius: 10px; color: white; margin: 8px 0; }
-        button { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.3s; font-weight: 600; }
-        button:hover { opacity: 0.8; transform: translateY(-1px); }
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid var(--border); }
-        .nav-item { color: var(--text); font-size: 1.2rem; cursor: pointer; }
+        .glass {
+            background: var(--card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Inputs & Buttons --- */
+        input, textarea {
+            width: 100%; padding: 14px 18px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            color: white; margin-bottom: 12px;
+            transition: 0.3s;
+        }
+        input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 4px var(--accent-glow); }
+
+        button {
+            background: var(--accent); color: white; border: none;
+            padding: 14px; border-radius: 16px; font-weight: 700;
+            cursor: pointer; transition: 0.3s; width: 100%;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px var(--accent-glow); }
+        button.secondary { background: #374151; }
+
+        /* --- Profile UI --- */
+        .profile-hero { text-align: center; }
+        .p-img { width: 120px; height: 120px; border-radius: 40px; object-fit: cover; border: 2px solid var(--accent); margin-bottom: 15px; box-shadow: 0 10px 30px var(--accent-glow); }
+        .id-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--accent); background: var(--accent-glow); padding: 6px 14px; border-radius: 99px; margin-top: 8px; display: inline-block; }
+
+        /* --- Feed & Posts --- */
+        .post-card { position: relative; }
+        .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .post-avatar { width: 35px; height: 35px; border-radius: 12px; border: 1px solid var(--accent); }
+        .post-media { width: 100%; border-radius: 18px; margin-top: 12px; display: block; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .post-time { font-size: 0.7rem; color: var(--text-dim); }
+
+        /* --- DM System --- */
+        .dm-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: none; flex-direction: column; }
+        .chat-area { flex: 1; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 14px; }
+        .msg { padding: 12px 18px; border-radius: 20px; max-width: 85%; font-size: 0.95rem; }
+        .sent { align-self: flex-end; background: var(--accent); border-bottom-right-radius: 4px; }
+        .received { align-self: flex-start; background: #1f2937; border-bottom-left-radius: 4px; }
+
+        /* --- Nav Bar --- */
+        nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 30px; display: flex; justify-content: space-around; padding: 12px; z-index: 99; }
+        .nav-link { color: var(--text-dim); font-size: 1.4rem; cursor: pointer; transition: 0.3s; }
+        .nav-link.active { color: var(--accent); text-shadow: 0 0 15px var(--accent); }
+
         .hidden { display: none !important; }
-        .msg { padding: 10px 15px; border-radius: 15px; max-width: 75%; font-size: 0.9rem; }
-        .sent { align-self: flex-end; background: var(--accent); }
-        .received { align-self: flex-start; background: var(--border); }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 800; color: var(--accent)">SHARETOPT v18</div>
-    <div id="top-id" class="mono"></div>
+    <div class="logo">SHARETOPT PRO</div>
+    <div id="online-id" class="id-badge hidden">...</div>
 </header>
 
-<div class="container" id="main-content">
-    <div id="auth-section" class="glass">
-        <h2 id="auth-title">Giriş</h2>
+<div class="container">
+    <div id="auth-box" class="glass">
+        <h2 style="margin-bottom: 20px; font-weight: 800; text-align:center;">Hoş Geldin</h2>
         <input type="email" id="email" placeholder="E-posta">
         <input type="password" id="pass" placeholder="Şifre">
-        <button id="auth-btn" style="width:100%">Giriş Yap</button>
-        <p id="toggle-auth" style="text-align:center; font-size:0.8rem; margin-top:15px; cursor:pointer">Hesap Oluştur</p>
+        <button id="auth-action">Devam Et</button>
+        <p id="auth-switch" style="text-align:center; margin-top:20px; font-size:0.85rem; color:var(--text-dim); cursor:pointer;">Hesabın yok mu? <span style="color:var(--accent)">Kayıt Ol</span></p>
     </div>
 
-    <div id="feed-section" class="hidden">
+    <div id="feed-box" class="hidden">
         <div class="glass">
-            <input type="text" id="post-text" placeholder="Ne düşünüyorsun?">
-            <input type="text" id="media-url" placeholder="Fotoğraf veya Video Linki (URL)">
-            <button id="post-btn" style="width:100%">Paylaş</button>
+            <textarea id="post-text" placeholder="Ne düşünüyorsun?" rows="2"></textarea>
+            <input type="text" id="post-media-url" placeholder="Görsel veya Video URL (Opsiyonel)">
+            <button id="post-send"><i class="fas fa-paper-plane"></i> Paylaş</button>
         </div>
-        <div id="feed-container"></div>
+        <div id="feed-items"></div>
     </div>
 
-    <div id="profile-section" class="hidden">
-        <div class="glass profile-header">
-            <img src="https://via.placeholder.com/100" id="profile-view-img" class="p-img">
-            <h3 id="profile-view-id">ID</h3>
-            <p id="profile-view-bio" style="color:var(--text-dim); font-size:0.9rem"></p>
+    <div id="profile-box" class="hidden">
+        <div class="glass profile-hero">
+            <img src="" id="p-img-view" class="p-img">
+            <h2 id="p-name-view">Yükleniyor...</h2>
+            <div id="p-id-view" class="id-badge">ID</div>
+            <p id="p-bio-view" style="margin-top:12px; font-size:0.9rem; color:var(--text-dim)"></p>
         </div>
+
         <div class="glass">
-            <h4>Profili Düzenle</h4>
-            <input type="text" id="edit-img" placeholder="Profil Fotoğrafı URL">
-            <textarea id="edit-bio" placeholder="Hakkımda bir şeyler yaz..."></textarea>
-            <button id="save-profile" style="width:100%">Güncelle</button>
+            <h4 style="margin-bottom:15px">Profili Güncelle</h4>
+            <input type="text" id="edit-name" placeholder="Yeni İsim">
+            <input type="text" id="edit-img-url" placeholder="Profil Fotoğrafı URL">
+            <textarea id="edit-bio" placeholder="Hakkımda..."></textarea>
+            <button id="update-profile">Kaydet</button>
         </div>
+
         <div class="glass">
-            <h4>Arkadaş Ekle</h4>
-            <input type="text" id="friend-id-input" placeholder="sjst-102_...">
-            <button id="add-friend-btn" style="width:100%">Arkadaşı Bul ve Ekle</button>
-            <div id="friends-list" style="margin-top:15px"></div>
+            <h4 style="margin-bottom:15px">Arkadaş Ekle & DM</h4>
+            <input type="text" id="f-id-input" placeholder="sjst-102_...">
+            <button id="f-add-btn" class="secondary">Bul ve Ekle</button>
+            <div id="f-list" style="margin-top:20px"></div>
+        </div>
+
+        <div class="glass" style="border-color: rgba(239, 68, 68, 0.3)">
+            <button onclick="logout()" class="secondary" style="margin-bottom:10px">Çıkış Yap</button>
+            <button id="delete-account" style="background:#ef4444">Hesabı Sil</button>
         </div>
     </div>
 </div>
 
-<div id="dm-window" class="dm-window">
-    <div class="dm-header">
-        <i class="fas fa-arrow-left" id="close-dm" style="cursor:pointer"></i>
-        <span id="chat-with-name" class="mono"></span>
+<div id="dm-view" class="dm-overlay">
+    <div style="padding:20px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:15px">
+        <i class="fas fa-arrow-left" onclick="closeDM()" style="cursor:pointer; font-size:1.2rem"></i>
+        <div style="display:flex; flex-direction:column">
+            <span id="dm-title" style="font-weight:700">Chat</span>
+            <span style="font-size:0.6rem; color:var(--accent)">ONLINE</span>
+        </div>
     </div>
-    <div class="chat-area" id="chat-area"></div>
-    <div style="padding:15px; display:flex; gap:10px; border-top:1px solid var(--border)">
-        <input type="text" id="dm-input" placeholder="Mesaj yaz...">
-        <button id="dm-send"><i class="fas fa-paper-plane"></i></button>
+    <div class="chat-area" id="chat-msgs"></div>
+    <div style="padding:20px; display:flex; gap:12px; background: rgba(17, 24, 39, 0.9)">
+        <input type="text" id="dm-input" placeholder="Mesajını yaz..." style="margin-bottom:0">
+        <button id="dm-send" style="width:60px"><i class="fas fa-location-arrow"></i></button>
     </div>
 </div>
 
-<nav class="nav-bar hidden" id="nav-bar">
-    <div class="nav-item" onclick="showTab('feed')"><i class="fas fa-home"></i></div>
-    <div class="nav-item" onclick="showTab('profile')"><i class="fas fa-user"></i></div>
-    <div class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i></div>
+<nav id="navbar" class="hidden">
+    <div class="nav-link active" onclick="showTab('feed', this)"><i class="fas fa-shapes"></i></div>
+    <div class="nav-link" onclick="showTab('profile', this)"><i class="fas fa-user-astronaut"></i></div>
 </nav>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getDatabase, ref, push, set, onValue, serverTimestamp, query, orderByChild, equalTo, get } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+import { getDatabase, ref, push, set, onValue, serverTimestamp, query, orderByChild, equalTo, get, remove } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, deleteUser } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAFtCQjGACAmoOSEIazC648I1BaLPkT8-U",
     authDomain: "share-your-thoughts-e15a7.firebaseapp.com",
     databaseURL: "https://share-your-thoughts-e15a7-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "share-your-thoughts-e15a7",
-    storageBucket: "share-your-thoughts-e15a7.firebasestorage.app",
-    messagingSenderId: "137665399298",
-    appId: "1:137665399298:web:60e7087fc41db2670f751b"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-let myId = "", activeChatFriendId = "", isLogin = true;
+let myData = null, isLogin = true, activeDM = null;
 
-// --- AUTH LİSTENER ---
+// Auth Logic
 onAuthStateChanged(auth, async (user) => {
     if(user) {
         const snap = await get(ref(db, `users/${user.uid}`));
-        myId = snap.val()?.customId;
-        document.getElementById('auth-section').classList.add('hidden');
-        document.getElementById('nav-bar').classList.remove('hidden');
-        document.getElementById('top-id').innerText = myId.substring(0,15)+"...";
-        showTab('feed');
-        loadProfile();
+        myData = snap.val();
+        document.getElementById('auth-box').classList.add('hidden');
+        document.getElementById('navbar').classList.remove('hidden');
+        document.getElementById('online-id').classList.remove('hidden');
+        document.getElementById('online-id').innerText = myData.customId.substring(0,10) + "..";
+        showTab('feed', document.querySelector('.nav-link'));
         loadFeed();
+        loadProfileData();
     } else {
-        document.getElementById('auth-section').classList.remove('hidden');
-        document.getElementById('nav-bar').classList.add('hidden');
-        document.getElementById('feed-section').classList.add('hidden');
-        document.getElementById('profile-section').classList.add('hidden');
+        document.getElementById('auth-box').classList.remove('hidden');
+        document.getElementById('navbar').classList.add('hidden');
     }
 });
 
-// --- GİRİŞ / KAYIT ---
-document.getElementById('auth-btn').onclick = async () => {
+document.getElementById('auth-action').onclick = async () => {
     const e = document.getElementById('email').value, p = document.getElementById('pass').value;
     try {
         if(isLogin) await signInWithEmailAndPassword(auth, e, p);
         else {
             const res = await createUserWithEmailAndPassword(auth, e, p);
-            const cid = `sjst-102_${Math.random().toString(36).substring(2,7)}-vx2972${Date.now().toString().slice(-5)}`;
-            await set(ref(db, `users/${res.user.uid}`), { customId: cid, email: e, bio: "Merhaba!", img: "https://via.placeholder.com/100" });
+            const cid = `sjst-102_${Math.random().toString(36).substring(2,7)}-vx2972${Date.now().toString().slice(-4)}`;
+            await set(ref(db, `users/${res.user.uid}`), { customId: cid, name: "Gezgin", bio: "ShareTopt dünyasına katıldı.", img: "https://api.dicebear.com/7.x/avataaars/svg?seed=" + cid, email: e });
         }
     } catch(err) { alert(err.message); }
 };
 
-// --- SEKME YÖNETİMİ ---
-window.showTab = (tab) => {
-    document.getElementById('feed-section').className = tab === 'feed' ? '' : 'hidden';
-    document.getElementById('profile-section').className = tab === 'profile' ? '' : 'hidden';
-};
-
-// --- PROFİL SİSTEMİ ---
-async function loadProfile() {
+// Profile Data
+function loadProfileData() {
     onValue(ref(db, `users/${auth.currentUser.uid}`), (s) => {
         const d = s.val();
-        document.getElementById('profile-view-img').src = d.img;
-        document.getElementById('profile-view-id').innerText = d.customId;
-        document.getElementById('profile-view-bio').innerText = d.bio;
+        document.getElementById('p-img-view').src = d.img;
+        document.getElementById('p-name-view').innerText = d.name;
+        document.getElementById('p-id-view').innerText = d.customId;
+        document.getElementById('p-bio-view').innerText = d.bio;
     });
-    // Arkadaş Listesi & DM Başlatma
+
     onValue(ref(db, `friends/${auth.currentUser.uid}`), (s) => {
-        const list = document.getElementById('friends-list');
-        list.innerHTML = "<h5>Arkadaşlarım (DM için tıkla)</h5>";
+        const list = document.getElementById('f-list');
+        list.innerHTML = "";
         s.forEach(c => {
-            const btn = document.createElement('button');
-            btn.style = "margin:5px 0; background:#1f2937; font-size:0.7rem";
-            btn.innerText = c.val().friendId;
-            btn.onclick = () => openDM(c.val().friendId);
-            list.appendChild(btn);
+            const d = c.val();
+            const b = document.createElement('div');
+            b.style = "background: rgba(255,255,255,0.05); padding:15px; border-radius:15px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;";
+            b.innerHTML = `<span class="mono" style="font-size:0.8rem">${d.name}</span><button onclick="openDM('${d.id}')" style="width:auto; padding:8px 15px; font-size:0.7rem">DM</button>`;
+            list.appendChild(b);
         });
     });
 }
 
-document.getElementById('save-profile').onclick = () => {
-    set(ref(db, `users/${auth.currentUser.uid}/img`), document.getElementById('edit-img').value || "https://via.placeholder.com/100");
-    set(ref(db, `users/${auth.currentUser.uid}/bio`), document.getElementById('edit-bio').value || "");
+document.getElementById('update-profile').onclick = async () => {
+    const name = document.getElementById('edit-name').value;
+    const bio = document.getElementById('edit-bio').value;
+    const img = document.getElementById('edit-img-url').value;
+    if(name) await set(ref(db, `users/${auth.currentUser.uid}/name`), name);
+    if(bio) await set(ref(db, `users/${auth.currentUser.uid}/bio`), bio);
+    if(img) await set(ref(db, `users/${auth.currentUser.uid}/img`), img);
     alert("Profil Güncellendi!");
 };
 
-// --- MEDYA PAYLAŞIM SİSTEMİ ---
-document.getElementById('post-btn').onclick = () => {
-    const txt = document.getElementById('post-text').value, url = document.getElementById('media-url').value;
-    if(!txt && !url) return;
-    push(ref(db, "posts"), {
-        uid: auth.currentUser.uid,
-        authorId: myId,
-        text: txt,
-        media: url,
-        type: url.includes('mp4') ? 'video' : 'image',
-        time: serverTimestamp()
-    });
-    document.getElementById('post-text').value = ""; document.getElementById('media-url').value = "";
+// Feed Logic
+document.getElementById('post-send').onclick = async () => {
+    const text = document.getElementById('post-text').value;
+    const media = document.getElementById('post-media-url').value;
+    if(text || media) {
+        push(ref(db, "posts"), {
+            author: myData.name,
+            authorId: myData.customId,
+            authorImg: myData.img,
+            text, media,
+            type: media.includes('mp4') ? 'video' : 'image',
+            time: serverTimestamp()
+        });
+        document.getElementById('post-text').value = "";
+        document.getElementById('post-media-url').value = "";
+    }
 };
 
 function loadFeed() {
     onValue(ref(db, "posts"), (s) => {
-        const container = document.getElementById('feed-container');
+        const container = document.getElementById('feed-items');
         container.innerHTML = "";
         s.forEach(c => {
             const d = c.val();
             const card = document.createElement('div');
-            card.className = "glass feed-card";
-            let mediaHtml = "";
+            card.className = "glass post-card";
+            let mHtml = "";
             if(d.media) {
-                mediaHtml = d.type === 'video' ? `<video src="${d.media}" class="feed-vid" controls></video>` : `<img src="${d.media}" class="feed-img">`;
+                mHtml = d.type === 'video' ? `<video src="${d.media}" controls class="post-media"></video>` : `<img src="${d.media}" class="post-media">`;
             }
-            card.innerHTML = `<small class="mono">${d.authorId}</small><p>${d.text}</p>${mediaHtml}`;
+            card.innerHTML = `
+                <div class="post-header">
+                    <img src="${d.authorImg || 'https://via.placeholder.com/40'}" class="post-avatar">
+                    <div>
+                        <div style="font-weight:700; font-size:0.9rem">${d.author}</div>
+                        <div class="post-time">@${d.authorId.substring(0,10)}..</div>
+                    </div>
+                </div>
+                <p style="font-size:0.95rem; line-height:1.5;">${d.text}</p>
+                ${mHtml}
+            `;
             container.prepend(card);
         });
     });
 }
 
-// --- DM SİSTEMİ (GÜÇLÜ) ---
-function openDM(fid) {
-    activeChatFriendId = fid;
-    document.getElementById('dm-window').style.display = 'flex';
-    document.getElementById('chat-with-name').innerText = fid;
-    const chatId = [myId, fid].sort().join("_");
-    onValue(ref(db, `direct_messages/${chatId}`), (s) => {
-        const area = document.getElementById('chat-area');
+// DM System
+window.openDM = (fid) => {
+    activeDM = fid;
+    document.getElementById('dm-view').style.display = 'flex';
+    document.getElementById('dm-title').innerText = fid.substring(0,15);
+    const chatId = [myData.customId, fid].sort().join("_");
+    onValue(ref(db, `dms/${chatId}`), (s) => {
+        const area = document.getElementById('chat-msgs');
         area.innerHTML = "";
         s.forEach(c => {
             const m = c.val();
             const div = document.createElement('div');
-            div.className = `msg ${m.sender === myId ? 'sent' : 'received'}`;
+            div.className = `msg ${m.sender === myData.customId ? 'sent' : 'received'}`;
             div.innerText = m.text;
             area.appendChild(div);
         });
         area.scrollTop = area.scrollHeight;
     });
-}
+};
 
 document.getElementById('dm-send').onclick = () => {
     const t = document.getElementById('dm-input').value;
     if(!t) return;
-    const chatId = [myId, activeChatFriendId].sort().join("_");
-    push(ref(db, `direct_messages/${chatId}`), { sender: myId, text: t, time: serverTimestamp() });
+    const chatId = [myData.customId, activeDM].sort().join("_");
+    push(ref(db, `dms/${chatId}`), { sender: myData.customId, text: t, time: serverTimestamp() });
     document.getElementById('dm-input').value = "";
 };
 
-document.getElementById('close-dm').onclick = () => document.getElementById('dm-window').style.display = 'none';
+window.closeDM = () => document.getElementById('dm-view').style.display = 'none';
 
-// --- ARKADAŞ EKLEME ---
-document.getElementById('add-friend-btn').onclick = async () => {
-    const fid = document.getElementById('friend-id-input').value;
+// Friend Add
+document.getElementById('f-add-btn').onclick = async () => {
+    const fid = document.getElementById('f-id-input').value.trim();
     const qUser = query(ref(db, "users"), orderByChild("customId"), equalTo(fid));
-    const snap = await get(qUser);
-    if(snap.exists()) {
-        await set(ref(db, `friends/${auth.currentUser.uid}/${fid.replace(/\./g,'_')}`), { friendId: fid });
-        alert("Arkadaş eklendi!");
-    } else alert("Kullanıcı bulunamadı!");
+    const s = await get(qUser);
+    if(s.exists()) {
+        const friendData = Object.values(s.val())[0];
+        await set(ref(db, `friends/${auth.currentUser.uid}/${fid.replace(/[^a-z0-9]/gi,'')}`), { id: fid, name: friendData.name });
+        alert("Bağlantı Kuruldu!");
+    } else alert("ID Geçersiz!");
+};
+
+// Tabs & Navigation
+window.showTab = (tab, el) => {
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('feed-box').className = tab === 'feed' ? '' : 'hidden';
+    document.getElementById('profile-box').className = tab === 'profile' ? '' : 'hidden';
 };
 
 window.logout = () => signOut(auth);
-document.getElementById('toggle-auth').onclick = () => {
+document.getElementById('auth-switch').onclick = () => {
     isLogin = !isLogin;
-    document.getElementById('auth-title').innerText = isLogin ? "Giriş" : "Kayıt";
-    document.getElementById('auth-btn').innerText = isLogin ? "Giriş Yap" : "Kayıt Ol";
+    document.getElementById('auth-title').innerText = isLogin ? "Hoş Geldin" : "Kayıt Ol";
+    document.getElementById('auth-switch').innerHTML = isLogin ? "Hesabın yok mu? <span style='color:var(--accent)'>Kayıt Ol</span>" : "Zaten üye misin? <span style='color:var(--accent)'>Giriş Yap</span>";
+};
+
+document.getElementById('delete-account').onclick = async () => {
+    if(confirm("Hesabın ve tüm verilerin silinecek. Emin misin?")) {
+        await remove(ref(db, `users/${auth.currentUser.uid}`));
+        await deleteUser(auth.currentUser);
+    }
 };
 </script>
 </body>
     </html>
-    
+            
+v_192
