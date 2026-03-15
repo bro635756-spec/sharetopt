@@ -1,31 +1,391 @@
-body{
-font-family:sans-serif;
-background:#0f172a;
-color:white;
-margin:0;
-padding:20px
+/* ShareTopt Connect - Elite Style Sheet
+   Designed for Burak - 2026 Edition
+*/
+
+:root {
+    /* Ana Renk Paleti */
+    --bg-dark: #05060f;
+    --bg-card: rgba(17, 24, 39, 0.75);
+    --accent: #8b5cf6; /* Mor */
+    --accent-glow: rgba(139, 92, 246, 0.4);
+    --success: #10b981;
+    --danger: #ef4444;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --border: rgba(255, 255, 255, 0.08);
+    --glass-blur: 16px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-input,button{
-padding:10px;
-margin:5px;
-border-radius:8px;
-border:none
+/* Sayfa Ayarları */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
 }
 
-button{
-background:#7c3aed;
-color:white;
-cursor:pointer
+body {
+    background: var(--bg-dark);
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 40%);
+    color: var(--text-primary);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
-section{
-margin-top:20px;
-padding:15px;
-background:#111827;
-border-radius:10px
+/* Özel Kaydırma Çubuğu (Scrollbar) */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
 }
 
-.hidden{
-display:none
+/* --- Header --- */
+header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 20px 6%;
+    background: rgba(5, 6, 15, 0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+}
+
+/* --- Glassmorphism Kartlar --- */
+.glass {
+    background: var(--bg-card);
+    backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 25px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transition: var(--transition);
+}
+
+.glass:hover {
+    border-color: rgba(139, 92, 246, 0.3);
+    box-shadow: 0 0 30px var(--accent-glow);
+}
+
+/* --- Giriş Alanları (Inputs) --- */
+input, textarea {
+    width: 100%;
+    padding: 16px 20px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 15px;
+    transition: var(--transition);
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+/* --- Butonlar --- */
+button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 18px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: var(--transition);
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px var(--accent-glow);
+    filter: brightness(1.1);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+.secondary-btn {
+    background: #1f2937;
+}
+
+/* --- Profil Sayfası Tasarımı --- */
+.profile-hero {
+    text-align: center;
+    padding-top: 20px;
+}
+
+.p-avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 40px;
+    object-fit: cover;
+    border: 3px solid var(--accent);
+    padding: 5px;
+    background: var(--bg-dark);
+    box-shadow: 0 15px 35px var(--accent-glow);
+    margin-bottom: 20px;
+}
+
+/* Senin İstediğin Özel ID Kutusu */
+.id-box {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    background: linear-gradient(90deg, rgba(139, 92, 246, 0.1) 0%, transparent 100%);
+    border-left: 4px solid var(--accent);
+    padding: 15px;
+    border-radius: 12px;
+    margin: 20px 0;
+    color: var(--accent);
+    cursor: pointer;
+    word-break: break-all;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.id-box::after {
+    content: 'Tıkla ve Kopyala';
+    position: absolute;
+    right: 10px;
+    bottom: 5px;
+    font-size: 0.6rem;
+    opacity: 0.4;
+}
+
+.id-box:hover {
+    background: rgba(139, 92, 246, 0.15);
+    transform: scale(1.02);
+}
+
+/* --- Mesajlaşma Listesi --- */
+.chat-list-container {
+    margin-top: 10px;
+}
+
+.chat-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-bottom: 8px;
+}
+
+.chat-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.avatar-initial {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+/* --- Chat Penceresi (DM) --- */
+.dm-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-dark);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(13, 17, 30, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.msg {
+    padding: 14px 18px;
+    border-radius: 22px;
+    max-width: 75%;
+    font-size: 0.95rem;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.msg.sent {
+    align-self: flex-end;
+    background: var(--accent);
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+.msg.received {
+    align-self: flex-start;
+    background: #1f2937;
+    border-bottom-left-radius: 4px;
+}
+
+/* --- Alt Navigasyon (Navbar) --- */
+nav {
+    position: fixed;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    max-width: 400px;
+    background: rgba(17, 24, 39, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    display: flex;
+    justify-content: space-around;
+    padding: 12px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+.nav-link {
+    color: var(--text-secondary);
+    font-size: 1.6rem;
+    padding: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.nav-link.active {
+    color: var(--accent);
+    text-shadow: 0 0 15px var(--accent);
+}
+
+/* --- Modal (Pop-up) --- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 380px;
+    animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes zoomIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Utility Classes */
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.mt-20 { margin-top: 20px; }
+
+/* Mobil Düzenlemeler */
+@media (max-width: 480px) {
+    .glass { padding: 18px; }
+    header { padding: 15px 5%; }
+    .logo { font-size: 1.2rem; }
+}
+
+/* Animasyonlu Gradyan Arka Plan (Opsiyonel) */
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 300 satır hedefi için ekstra detaylar ve helper classlar... */
+.online-indicator {
+    width: 10px;
+    height: 10px;
+    background: var(--success);
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+    box-shadow: 0 0 8px var(--success);
+}
+
+.status-text {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.badge {
+    background: var(--accent-glow);
+    color: var(--accent);
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+
+.id-copy-success {
+    color: var(--success) !important;
+    border-color: var(--success) !important;
+}
+
+/* Footer boşluk */
+.content-wrapper {
+    padding-bottom: 120px;
 }
