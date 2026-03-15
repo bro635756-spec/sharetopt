@@ -1,73 +1,70 @@
-v_0191
+v_191
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShareTopt Pro v18</title>
+    <title>ShareTopt Pro v18 - ID System</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --bg: #0f172a;
-            --card: #1e293b;
-            --accent: #6366f1;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --border: #334155;
-            --radius: 12px;
+            --bg: #0a0f18;
+            --card: #141b2d;
+            --accent: #8b5cf6;
+            --text-main: #f1f5f9;
+            --text-dim: #64748b;
+            --border: #1e293b;
+            --radius: 14px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text-primary); overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text-main); line-height: 1.5; }
+        .mono { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
 
-        /* Header & Navbar */
-        header {
-            position: sticky; top: 0; z-index: 1000;
-            background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(12px);
-            padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border);
-        }
-        .logo { font-weight: 600; font-size: 1.2rem; color: var(--accent); display: flex; align-items: center; gap: 8px; }
-        
-        .nav-toggle { font-size: 1.5rem; cursor: pointer; color: var(--text-primary); transition: 0.3s; }
-        .nav-toggle:hover { color: var(--accent); }
-
+        /* Sidebar & Overlay */
         .sidebar {
             position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
-            background: var(--card); z-index: 1001; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 2rem; border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            background: var(--card); z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 30px; border-left: 1px solid var(--border);
         }
         .sidebar.active { right: 0; }
-        .sidebar a { display: block; color: var(--text-secondary); text-decoration: none; padding: 12px 0; font-size: 1rem; border-bottom: 1px solid var(--border); transition: 0.3s; }
-        .sidebar a:hover { color: var(--accent); padding-left: 8px; }
-
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; z-index: 1000; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; z-index: 1000; }
         .overlay.active { display: block; }
+        .sidebar a { display: block; color: var(--text-dim); text-decoration: none; padding: 15px 0; border-bottom: 1px solid var(--border); transition: 0.3s; }
+        .sidebar a:hover { color: var(--accent); padding-left: 10px; }
 
-        /* Main Container */
-        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
-        .glass-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
+        /* Header */
+        header {
+            position: sticky; top: 0; z-index: 100; padding: 1rem 5%;
+            background: rgba(10, 15, 24, 0.8); backdrop-filter: blur(15px);
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .logo { font-weight: 700; font-size: 1.3rem; color: var(--accent); letter-spacing: -1px; }
+
+        /* Layout */
+        .container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        .glass-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 25px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
 
         /* Auth UI */
-        #auth-container { max-width: 400px; margin: 80px auto; text-align: center; }
-        .input-field { width: 100%; padding: 12px; margin: 8px 0; background: #0f172a; border: 1px solid var(--border); border-radius: 8px; color: white; transition: 0.3s; }
-        .input-field:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
-        
-        button { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        button:hover { background: #4f46e5; transform: translateY(-1px); }
-        .switch-mode { margin-top: 15px; font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; }
-        .switch-mode b { color: var(--accent); }
+        #auth-container { max-width: 400px; margin: 100px auto; text-align: center; }
+        input { width: 100%; padding: 14px; margin: 10px 0; background: #070b14; border: 1px solid var(--border); border-radius: 10px; color: white; transition: 0.3s; }
+        input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15); }
+        button { width: 100%; padding: 14px; background: var(--accent); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        button:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .switch-btn { margin-top: 15px; color: var(--text-dim); cursor: pointer; font-size: 0.9rem; }
 
-        /* Messaging UI */
-        .chat-box { height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin: 20px 0; padding: 10px; background: #0f172a; border-radius: 8px; }
-        .msg { padding: 10px 15px; border-radius: 18px; max-width: 80%; font-size: 0.9rem; }
+        /* Chat UI */
+        .chat-box { height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin: 15px 0; padding: 15px; background: #070b14; border-radius: 10px; }
+        .msg { padding: 12px 16px; border-radius: 16px; max-width: 85%; position: relative; }
         .msg.sent { align-self: flex-end; background: var(--accent); color: white; border-bottom-right-radius: 2px; }
-        .msg.received { align-self: flex-start; background: var(--border); color: var(--text-primary); border-bottom-left-radius: 2px; }
-        .msg small { display: block; font-size: 0.7rem; opacity: 0.7; margin-top: 4px; }
+        .msg.received { align-self: flex-start; background: var(--border); color: white; border-bottom-left-radius: 2px; }
+        .msg-info { display: block; font-size: 0.65rem; margin-top: 5px; opacity: 0.7; font-family: 'JetBrains Mono'; }
 
+        .id-badge { background: #1e293b; padding: 4px 10px; border-radius: 6px; color: var(--accent); font-weight: bold; }
         .hidden { display: none !important; }
     </style>
 </head>
@@ -76,51 +73,54 @@ v_0191
 <div class="overlay" id="overlay"></div>
 
 <header>
-    <div class="logo"><i class="fas fa-brain"></i> ShareTopt <small style="font-size: 0.6rem; opacity: 0.6;">v18</small></div>
-    <div id="user-info" class="hidden" style="font-size: 0.8rem; color: var(--text-secondary);"></div>
-    <div class="nav-toggle" id="menu-btn">☰</div>
+    <div class="logo">SHARETOPT PRO</div>
+    <div id="id-display" class="mono hidden"></div>
+    <div style="cursor:pointer; font-size: 1.5rem;" id="menu-trigger">☰</div>
 </header>
 
 <nav class="sidebar" id="sidebar">
-    <h3 style="margin-bottom: 20px;">Menü</h3>
-    <a href="#app"><i class="fas fa-comments"></i> Mesajlar</a>
-    <a href="#friends-section"><i class="fas fa-user-plus"></i> Arkadaşlar</a>
-    <a href="#" id="logout-btn" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a>
+    <div style="margin-bottom: 30px;">
+        <h4 style="color: var(--text-dim);">Profilim</h4>
+        <div id="my-full-id" class="mono" style="font-size: 0.7rem; margin-top: 5px; word-break: break-all;"></div>
+    </div>
+    <a href="#app"><i class="fas fa-comment"></i> Chat</a>
+    <a href="#friends"><i class="fas fa-user-friends"></i> Arkadaşlar</a>
+    <a href="#" id="logout-btn" style="color: #f87171;"><i class="fas fa-power-off"></i> Çıkış</a>
 </nav>
 
 <div class="container">
     <div id="auth-container" class="glass-card">
         <h2 id="auth-title">Giriş Yap</h2>
-        <input type="email" id="email" class="input-field" placeholder="E-posta">
-        <input type="password" id="pass" class="input-field" placeholder="Şifre">
-        <button id="auth-btn">Devam Et</button>
-        <div class="switch-mode" id="toggle-auth">Hesabın yok mu? <b>Kayıt Ol</b></div>
+        <input type="email" id="email" placeholder="E-posta">
+        <input type="password" id="pass" placeholder="Şifre">
+        <button id="auth-submit">Giriş Yap</button>
+        <div class="switch-btn" id="auth-toggle">Hesabın yok mu? Kayıt Ol</div>
     </div>
 
     <div id="app" class="hidden">
         <div class="glass-card">
-            <h3><i class="fas fa-paper-plane"></i> Genel Sohbet</h3>
+            <h3>Genel Sohbet</h3>
             <div class="chat-box" id="chat-box"></div>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="msg-input" class="input-field" placeholder="Mesajınızı yazın...">
-                <button id="send-btn" style="width: auto;"><i class="fas fa-chevron-right"></i></button>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="chat-input" placeholder="Mesaj gönder...">
+                <button id="chat-send" style="width: 60px;"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
 
-        <div id="friends-section" class="glass-card">
-            <h3><i class="fas fa-users"></i> Arkadaş Ekle</h3>
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <input type="email" id="friend-email" class="input-field" placeholder="Arkadaşının e-postası">
-                <button id="add-friend-btn" style="width: auto;">Ekle</button>
+        <div id="friends" class="glass-card">
+            <h3>ID ile Arkadaş Ekle</h3>
+            <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <input type="text" id="friend-id-input" placeholder="sjst-102_xxxxx...">
+                <button id="friend-add-btn" style="width: 80px;">Ekle</button>
             </div>
-            <ul id="friends-list" style="list-style: none; margin-top: 15px;"></ul>
+            <div id="friends-list" style="margin-top: 20px;"></div>
         </div>
     </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getDatabase, ref, push, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+import { getDatabase, ref, push, set, onValue, serverTimestamp, query, orderByChild, equalTo, get } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -137,126 +137,130 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-let isLoginMode = true;
+let isLogin = true;
+let userCustomId = "";
 
-// UI Elements
-const menuBtn = document.getElementById('menu-btn');
-const sidebar = document.getElementById('sidebar');
-const overlay = document.getElementById('overlay');
-const authContainer = document.getElementById('auth-container');
-const appDiv = document.getElementById('app');
-const userInfo = document.getElementById('user-info');
+// Generate Custom ID: sjst-102_xxxxx-vx2972xxxx
+const generateProId = () => {
+    const part1 = Math.random().toString(36).substring(2, 7);
+    const part2 = Math.random().toString(36).substring(2, 12);
+    return `sjst-102_${part1}-vx2972${part2}`;
+};
 
-// Hamburger Menu Logic
-const toggleMenu = () => { sidebar.classList.toggle('active'); overlay.classList.toggle('active'); };
-menuBtn.onclick = toggleMenu;
-overlay.onclick = toggleMenu;
+// UI Toggles
+const side = document.getElementById('sidebar');
+const over = document.getElementById('overlay');
+document.getElementById('menu-trigger').onclick = () => { side.classList.add('active'); over.classList.add('active'); };
+over.onclick = () => { side.classList.remove('active'); over.classList.remove('active'); };
 
-// Auth State
-onAuthStateChanged(auth, (user) => {
+// Auth Controller
+onAuthStateChanged(auth, async (user) => {
     if (user) {
-        authContainer.classList.add('hidden');
-        appDiv.classList.remove('hidden');
-        userInfo.classList.remove('hidden');
-        userInfo.innerText = user.email;
-        loadMessages();
-        loadFriends();
+        const snapshot = await get(ref(db, `users/${user.uid}`));
+        userCustomId = snapshot.val()?.customId || "Bilinmiyor";
+        
+        document.getElementById('auth-container').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        document.getElementById('id-display').classList.remove('hidden');
+        document.getElementById('id-display').innerHTML = `<span class="id-badge">${userCustomId.substring(0,12)}...</span>`;
+        document.getElementById('my-full-id').innerText = userCustomId;
+        
+        initApp();
     } else {
-        authContainer.classList.remove('hidden');
-        appDiv.classList.add('hidden');
-        userInfo.classList.add('hidden');
+        document.getElementById('auth-container').classList.remove('hidden');
+        document.getElementById('app').classList.add('hidden');
+        document.getElementById('id-display').classList.add('hidden');
     }
 });
 
-// Register / Login Logic
-document.getElementById('auth-btn').onclick = async () => {
-    const email = document.getElementById('email').value;
+document.getElementById('auth-submit').onclick = async () => {
+    const mail = document.getElementById('email').value;
     const pass = document.getElementById('pass').value;
-    if(!email || !pass) return alert("Bilgileri doldur!");
-
     try {
-        if (isLoginMode) {
-            await signInWithEmailAndPassword(auth, email, pass);
-        } else {
-            const res = await createUserWithEmailAndPassword(auth, email, pass);
-            // Otomatik Özel ID Oluşturma
-            const specialId = `sj-${Math.random().toString(36).substring(2,10)}_v18-${Date.now()}`;
-            await set(ref(db, `users/${res.user.uid}`), {
-                email: email,
-                customId: specialId,
-                joinedAt: serverTimestamp()
-            });
-            alert("Kayıt başarılı! ID'niz: " + specialId);
+        if(isLogin) await signInWithEmailAndPassword(auth, mail, pass);
+        else {
+            const res = await createUserWithEmailAndPassword(auth, mail, pass);
+            const newId = generateProId();
+            await set(ref(db, `users/${res.user.uid}`), { customId: newId, email: mail });
+            alert("Kayıt Başarılı! ID'niz: " + newId);
         }
-    } catch (e) { alert(e.message); }
+    } catch(e) { alert(e.message); }
 };
 
-document.getElementById('toggle-auth').onclick = () => {
-    isLoginMode = !isLoginMode;
-    document.getElementById('auth-title').innerText = isLoginMode ? "Giriş Yap" : "Kayıt Ol";
-    document.getElementById('auth-btn').innerText = isLoginMode ? "Devam Et" : "Kayıt Ol";
-    document.getElementById('toggle-auth').innerHTML = isLoginMode ? "Hesabın yok mu? <b>Kayıt Ol</b>" : "Zaten üye misin? <b>Giriş Yap</b>";
+document.getElementById('auth-toggle').onclick = () => {
+    isLogin = !isLogin;
+    document.getElementById('auth-title').innerText = isLogin ? "Giriş Yap" : "Kayıt Ol";
+    document.getElementById('auth-submit').innerText = isLogin ? "Giriş Yap" : "Kayıt Ol";
+    document.getElementById('auth-toggle').innerText = isLogin ? "Hesabın yok mu? Kayıt Ol" : "Zaten üye misin? Giriş Yap";
 };
 
-document.getElementById('logout-btn').onclick = () => { signOut(auth); toggleMenu(); };
+document.getElementById('logout-btn').onclick = () => signOut(auth);
 
-// Messaging Logic
-document.getElementById('send-btn').onclick = sendMessage;
-document.getElementById('msg-input').onkeypress = (e) => { if(e.key === 'Enter') sendMessage(); };
-
-function sendMessage() {
-    const text = document.getElementById('msg-input').value.trim();
-    if(!text) return;
-    push(ref(db, "messages"), {
-        text: text,
-        sender: auth.currentUser.email,
-        uid: auth.currentUser.uid,
-        time: serverTimestamp()
-    });
-    document.getElementById('msg-input').value = "";
-}
-
-function loadMessages() {
-    onValue(ref(db, "messages"), (snapshot) => {
-        const chatBox = document.getElementById('chat-box');
-        chatBox.innerHTML = "";
-        snapshot.forEach((child) => {
-            const data = child.val();
-            const isMe = data.uid === auth.currentUser.uid;
+// App Logic
+function initApp() {
+    // Chat
+    onValue(ref(db, "chats"), (snap) => {
+        const box = document.getElementById('chat-box');
+        box.innerHTML = "";
+        snap.forEach(c => {
+            const d = c.val();
+            const me = d.senderId === userCustomId;
             const div = document.createElement('div');
-            div.className = `msg ${isMe ? 'sent' : 'received'}`;
-            div.innerHTML = `
-                ${data.text}
-                <small>${isMe ? 'Siz' : data.sender.split('@')[0]}</small>
-            `;
-            chatBox.appendChild(div);
+            div.className = `msg ${me ? 'sent' : 'received'}`;
+            div.innerHTML = `${d.text}<span class="msg-info">${me ? 'Siz' : d.senderId.substring(0,8)}</span>`;
+            box.appendChild(div);
         });
-        chatBox.scrollTop = chatBox.scrollHeight;
+        box.scrollTop = box.scrollHeight;
     });
-}
 
-// Friends Logic
-document.getElementById('add-friend-btn').onclick = () => {
-    const email = document.getElementById('friend-email').value.trim();
-    if(!email) return;
-    const safeEmail = email.replace(/\./g, '_');
-    set(ref(db, `friends/${auth.currentUser.uid}/${safeEmail}`), { email: email });
-    document.getElementById('friend-email').value = "";
-};
-
-function loadFriends() {
-    onValue(ref(db, `friends/${auth.currentUser.uid}`), (snapshot) => {
+    // Friends List
+    onValue(ref(db, `friends/${auth.currentUser.uid}`), (snap) => {
         const list = document.getElementById('friends-list');
         list.innerHTML = "";
-        snapshot.forEach((child) => {
-            const li = document.createElement('li');
-            li.style = "padding: 10px; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--text-secondary)";
-            li.innerHTML = `<i class="fas fa-user-circle"></i> ${child.val().email}`;
-            list.appendChild(li);
+        snap.forEach(c => {
+            const d = c.val();
+            const item = document.createElement('div');
+            item.className = "mono";
+            item.style = "padding: 10px; border-bottom: 1px solid #1e293b; color: #94a3b8; font-size: 0.8rem;";
+            item.innerHTML = `<i class="fas fa-link"></i> ${d.friendId}`;
+            list.appendChild(item);
         });
     });
 }
+
+document.getElementById('chat-send').onclick = () => {
+    const txt = document.getElementById('chat-input').value;
+    if(!txt) return;
+    push(ref(db, "chats"), {
+        text: txt,
+        senderId: userCustomId,
+        time: serverTimestamp()
+    });
+    document.getElementById('chat-input').value = "";
+};
+
+document.getElementById('friend-add-btn').onclick = async () => {
+    const fId = document.getElementById('friend-id-input').value.trim();
+    if(!fId) return;
+    
+    // Arkadaşın ID'sinin sistemde olup olmadığını kontrol et
+    const usersRef = ref(db, 'users');
+    const q = query(usersRef, orderByChild('customId'), equalTo(fId));
+    const snap = await get(q);
+    
+    if(snap.exists()) {
+        await set(ref(db, `friends/${auth.currentUser.uid}/${fId.replace(/[^a-zA-Z0-9]/g, '')}`), {
+            friendId: fId,
+            addedAt: serverTimestamp()
+        });
+        alert("Arkadaş eklendi!");
+        document.getElementById('friend-id-input').value = "";
+    } else {
+        alert("Bu ID'ye sahip bir kullanıcı bulunamadı!");
+    }
+};
 </script>
 </body>
-                </html>
+            </html>
+v_191
     
