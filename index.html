@@ -5,23 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ShareTopt v0.184</title>
 <style>
+/* --- GENEL STİL --- */
 body{ font-family: Arial,sans-serif; margin:0; padding:0; background:#0f172a; color:white; display:flex; flex-direction:column; align-items:center; }
-header{ padding:20px; text-align:center; }
-.add{ margin:20px 0; display:flex; gap:10px; flex-wrap:wrap; }
+header{ padding:20px; text-align:center; background:#1e293b; width:100%; }
+header h1{ margin:0; }
+.add{ margin:20px 0; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
 input, select, button{ padding:10px; border-radius:8px; border:none; font-size:1rem; }
 button{ background:#2563eb; color:white; cursor:pointer; transition:0.3s; }
 button:hover{ background:#1e40af; }
 .idea{ background:#1e293b; margin:10px; padding:15px; border-radius:10px; width:90%; max-width:400px; box-shadow:0 5px 15px rgba(0,0,0,0.3); transition:0.3s; }
 .idea:hover{ transform: scale(1.02); }
 .vote{ cursor:pointer; color:yellow; font-weight:bold; display:block; margin-top:5px; }
-.helpSection{
-    background:#334155;
-    padding:15px;
-    border-radius:10px;
-    width:90%;
-    max-width:500px;
-    margin:10px auto;
-}
+.helpSection{ background:#334155; padding:15px; border-radius:10px; width:90%; max-width:500px; margin:10px auto; }
 .helpSection p{ margin:5px 0; }
 </style>
 </head>
@@ -54,17 +49,18 @@ import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, deleteDoc } 
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-// Firebase config
+// --- FIREBASE CONFIG ---
 const firebaseConfig = {
   apiKey: "AIzaSyAFtCQjGACAmoOSEIazC648I1BaLPkT8-U",
-  authDomain: "sharetopt.firebaseapp.com",
-  projectId: "sharetopt",
-  storageBucket: "sharetopt.appspot.com",
-  messagingSenderId: "1234567890",
-  appId: "1:1234567890:web:abcdef123456"
+  authDomain: "share-your-thoughts-e15a7.firebaseapp.com",
+  databaseURL: "https://share-your-thoughts-e15a7-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "share-your-thoughts-e15a7",
+  storageBucket: "share-your-thoughts-e15a7.firebasestorage.app",
+  messagingSenderId: "137665399298",
+  appId: "1:137665399298:web:60e7087fc41db2670f751b"
 };
 
-// Initialize
+// --- INITIALIZE ---
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -72,7 +68,7 @@ const auth = getAuth();
 const provider = new GoogleAuthProvider();
 let currentUser = null;
 
-// Elements
+// --- ELEMENTS ---
 const ideaInput = document.getElementById("ideaInput");
 const categoryInput = document.getElementById("category");
 const ideasDiv = document.getElementById("ideas");
@@ -83,18 +79,16 @@ const loginBtn = document.getElementById("loginBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 const helpBtn = document.getElementById("helpBtn");
 
-// Auth
-loginBtn.onclick = () => {
-    signInWithPopup(auth, provider)
+// --- AUTH ---
+loginBtn.onclick = () => signInWithPopup(auth, provider)
     .then(result => { currentUser = result.user; loadIdeas(); })
     .catch(console.error);
-}
-logoutBtn.onclick = () => {
-    signOut(auth).then(()=>{ currentUser=null; loadIdeas(); });
-}
+
+logoutBtn.onclick = () => signOut(auth).then(()=>{ currentUser=null; loadIdeas(); });
+
 onAuthStateChanged(auth, user => currentUser=user);
 
-// Add idea
+// --- ADD IDEA ---
 addBtn.onclick = async () => {
     if(!currentUser) return alert("Giriş yapmalısınız!");
     const text = ideaInput.value.trim();
@@ -111,7 +105,7 @@ addBtn.onclick = async () => {
     loadIdeas();
 };
 
-// Load ideas
+// --- LOAD IDEAS ---
 async function loadIdeas(){
     const ideasSnapshot = await getDocs(collection(db,"ideas"));
     ideasDiv.innerHTML="";
@@ -131,21 +125,21 @@ async function loadIdeas(){
     });
 }
 
-// Vote
+// --- VOTE ---
 window.vote = async (key,votes) => {
     if(!currentUser) return alert("Giriş yapmalısınız!");
     const ideaRef = doc(db,"ideas",key);
     await updateDoc(ideaRef,{votes:votes+1});
-}
+};
 
-// Delete
+// --- DELETE ---
 window.deleteIdea = async (key) => {
     if(!currentUser) return alert("Giriş yapmalısınız!");
     const ideaRef = doc(db,"ideas",key);
     await deleteDoc(ideaRef);
-}
+};
 
-// Media upload
+// --- MEDIA UPLOAD ---
 uploadBtn.onclick = async () => {
     if(!currentUser) return alert("Giriş yapmalısınız!");
     const file = mediaInput.files[0];
@@ -154,9 +148,9 @@ uploadBtn.onclick = async () => {
     await uploadBytes(storageRef,file);
     const url = await getDownloadURL(storageRef);
     console.log("Media URL:",url);
-}
+};
 
-// Help
+// --- HELP DATA ---
 const helpData = [
     { question: "Fikir eklemek için ne yapmalıyım?", answer: "Metin kutusuna fikrini yaz ve Paylaş butonuna tıkla." },
     { question: "Kategori nasıl seçilir?", answer: "Kategori açılır menüsünden uygun kategoriyi seç." },
@@ -165,6 +159,7 @@ const helpData = [
     { question: "Oy kullanabilir miyim?", answer: "Her fikir için yukarı ok simgesine tıklayarak oy verebilirsin." }
 ];
 
+// --- HELP BUTTON ---
 helpBtn.onclick = () => {
     let helpDiv = document.querySelector(".helpSection");
     if(helpDiv) helpDiv.remove();
@@ -180,11 +175,11 @@ helpBtn.onclick = () => {
         helpDiv.appendChild(a);
     });
     document.body.appendChild(helpDiv);
-}
+};
 
-// Initialize
+// --- INIT ---
 loadIdeas();
-</script>
 
+</script>
 </body>
-      </html>
+</html>
