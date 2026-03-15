@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShareTopt</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+<h2>ShareTopt</h2>
+</header>
+
+<div id="authBox">
+<h3>Giriş / Kayıt</h3>
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Şifre">
+<button onclick="login()">Giriş Yap</button>
+<button onclick="register()">Kayıt Ol</button>
+</div>
+
+<div id="app" class="hidden">
+
+<section>
+<h3>Profil</h3>
+<p>ID: <span id="myId"></span></p>
+</section>
+
+<section>
+<h3>Arkadaş Ekle</h3>
+<input id="friendInput" placeholder="ID veya isim">
+<button onclick="addFriend()">Ekle</button>
+</section>
+
+<section>
+<h3>Arkadaşlar</h3>
+<div id="friends"></div>
+</section>
+
+<section>
+<h3>Chat</h3>
+<div id="chatBox"></div>
+<input id="message">
+<button onclick="sendMessage()">Gönder</button>
+</section>
+
+<section>
+<h3>Topluluk</h3>
+<input id="postInput">
+<button onclick="post()">Paylaş</button>
+<div id="posts"></div>
+</section>
+
+</div>
+
+<script type="module" src="app.js"></script>
+
+</body>
+  </html>
