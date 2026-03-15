@@ -1,1 +1,190 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShareTopt v0.184</title>
+<style>
+body{ font-family: Arial,sans-serif; margin:0; padding:0; background:#0f172a; color:white; display:flex; flex-direction:column; align-items:center; }
+header{ padding:20px; text-align:center; }
+.add{ margin:20px 0; display:flex; gap:10px; flex-wrap:wrap; }
+input, select, button{ padding:10px; border-radius:8px; border:none; font-size:1rem; }
+button{ background:#2563eb; color:white; cursor:pointer; transition:0.3s; }
+button:hover{ background:#1e40af; }
+.idea{ background:#1e293b; margin:10px; padding:15px; border-radius:10px; width:90%; max-width:400px; box-shadow:0 5px 15px rgba(0,0,0,0.3); transition:0.3s; }
+.idea:hover{ transform: scale(1.02); }
+.vote{ cursor:pointer; color:yellow; font-weight:bold; display:block; margin-top:5px; }
+.helpSection{
+    background:#334155;
+    padding:15px;
+    border-radius:10px;
+    width:90%;
+    max-width:500px;
+    margin:10px auto;
+}
+.helpSection p{ margin:5px 0; }
+</style>
+</head>
+<body>
 
+<header>
+    <h1>💡 ShareTopt</h1>
+    <button id="loginBtn">Giriş Yap</button>
+    <button id="logoutBtn">Çıkış</button>
+</header>
+
+<section class="add">
+    <input id="ideaInput" placeholder="Fikrini yaz">
+    <select id="category">
+        <option>AI</option>
+        <option>Oyun</option>
+        <option>Araç</option>
+    </select>
+    <button id="addBtn">Paylaş</button>
+    <button id="helpBtn">Bana Yardımcı Ol</button>
+    <input type="file" id="mediaFile">
+    <button id="uploadBtn">Media Yükle</button>
+</section>
+
+<section id="ideas"></section>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAFtCQjGACAmoOSEIazC648I1BaLPkT8-U",
+  authDomain: "sharetopt.firebaseapp.com",
+  projectId: "sharetopt",
+  storageBucket: "sharetopt.appspot.com",
+  messagingSenderId: "1234567890",
+  appId: "1:1234567890:web:abcdef123456"
+};
+
+// Initialize
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
+const auth = getAuth();
+const provider = new GoogleAuthProvider();
+let currentUser = null;
+
+// Elements
+const ideaInput = document.getElementById("ideaInput");
+const categoryInput = document.getElementById("category");
+const ideasDiv = document.getElementById("ideas");
+const addBtn = document.getElementById("addBtn");
+const mediaInput = document.getElementById("mediaFile");
+const uploadBtn = document.getElementById("uploadBtn");
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const helpBtn = document.getElementById("helpBtn");
+
+// Auth
+loginBtn.onclick = () => {
+    signInWithPopup(auth, provider)
+    .then(result => { currentUser = result.user; loadIdeas(); })
+    .catch(console.error);
+}
+logoutBtn.onclick = () => {
+    signOut(auth).then(()=>{ currentUser=null; loadIdeas(); });
+}
+onAuthStateChanged(auth, user => currentUser=user);
+
+// Add idea
+addBtn.onclick = async () => {
+    if(!currentUser) return alert("Giriş yapmalısınız!");
+    const text = ideaInput.value.trim();
+    const category = categoryInput.value;
+    if(!text) return alert("Fikir boş olamaz!");
+    await addDoc(collection(db,"ideas"),{
+        text, category,
+        ownerId: currentUser.uid,
+        ownerName: currentUser.displayName,
+        votes:0,
+        created:Date.now()
+    });
+    ideaInput.value="";
+    loadIdeas();
+};
+
+// Load ideas
+async function loadIdeas(){
+    const ideasSnapshot = await getDocs(collection(db,"ideas"));
+    ideasDiv.innerHTML="";
+    ideasSnapshot.forEach(docSnap=>{
+        const data = docSnap.data();
+        const key = docSnap.id;
+        const div = document.createElement("div");
+        div.className = "idea";
+        div.innerHTML = `
+            <h3>${data.text}</h3>
+            <p>Kategori: ${data.category}</p>
+            <p>Paylaşan: ${data.ownerName}</p>
+            <span class="vote" onclick="vote('${key}',${data.votes})">⬆ ${data.votes}</span>
+            ${(currentUser && data.ownerId===currentUser.uid)? `<button onclick="deleteIdea('${key}')">Sil</button>`:""}
+        `;
+        ideasDiv.appendChild(div);
+    });
+}
+
+// Vote
+window.vote = async (key,votes) => {
+    if(!currentUser) return alert("Giriş yapmalısınız!");
+    const ideaRef = doc(db,"ideas",key);
+    await updateDoc(ideaRef,{votes:votes+1});
+}
+
+// Delete
+window.deleteIdea = async (key) => {
+    if(!currentUser) return alert("Giriş yapmalısınız!");
+    const ideaRef = doc(db,"ideas",key);
+    await deleteDoc(ideaRef);
+}
+
+// Media upload
+uploadBtn.onclick = async () => {
+    if(!currentUser) return alert("Giriş yapmalısınız!");
+    const file = mediaInput.files[0];
+    if(!file) return;
+    const storageRef = ref(storage, `media/${currentUser.uid}_${Date.now()}_${file.name}`);
+    await uploadBytes(storageRef,file);
+    const url = await getDownloadURL(storageRef);
+    console.log("Media URL:",url);
+}
+
+// Help
+const helpData = [
+    { question: "Fikir eklemek için ne yapmalıyım?", answer: "Metin kutusuna fikrini yaz ve Paylaş butonuna tıkla." },
+    { question: "Kategori nasıl seçilir?", answer: "Kategori açılır menüsünden uygun kategoriyi seç." },
+    { question: "Media yükleyebilir miyim?", answer: "Dosya seçip Media Yükle butonuna basabilirsin." },
+    { question: "Fikri silebilir miyim?", answer: "Kendi eklediğin fikirlerin yanında çıkan Sil butonuna bas." },
+    { question: "Oy kullanabilir miyim?", answer: "Her fikir için yukarı ok simgesine tıklayarak oy verebilirsin." }
+];
+
+helpBtn.onclick = () => {
+    let helpDiv = document.querySelector(".helpSection");
+    if(helpDiv) helpDiv.remove();
+    helpDiv = document.createElement("div");
+    helpDiv.className = "helpSection";
+    helpDiv.innerHTML = "<h3>Öğretici Yardım</h3>";
+    helpData.forEach(item=>{
+        const q = document.createElement("p");
+        q.innerHTML = `<b>Soru:</b> ${item.question}`;
+        const a = document.createElement("p");
+        a.innerHTML = `<b>Cevap:</b> ${item.answer}`;
+        helpDiv.appendChild(q);
+        helpDiv.appendChild(a);
+    });
+    document.body.appendChild(helpDiv);
+}
+
+// Initialize
+loadIdeas();
+</script>
+
+</body>
+      </html>
