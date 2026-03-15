@@ -3,183 +3,215 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShareTopt v0.184</title>
-<style>
-/* --- GENEL STİL --- */
-body{ font-family: Arial,sans-serif; margin:0; padding:0; background:#0f172a; color:white; display:flex; flex-direction:column; align-items:center; }
-header{ padding:20px; text-align:center; background:#1e293b; width:100%; }
-header h1{ margin:0; }
-.add{ margin:20px 0; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
-input, select, button{ padding:10px; border-radius:8px; border:none; font-size:1rem; }
-button{ background:#2563eb; color:white; cursor:pointer; transition:0.3s; }
-button:hover{ background:#1e40af; }
-.idea{ background:#1e293b; margin:10px; padding:15px; border-radius:10px; width:90%; max-width:400px; box-shadow:0 5px 15px rgba(0,0,0,0.3); transition:0.3s; }
-.idea:hover{ transform: scale(1.02); }
-.vote{ cursor:pointer; color:yellow; font-weight:bold; display:block; margin-top:5px; }
-.helpSection{ background:#334155; padding:15px; border-radius:10px; width:90%; max-width:500px; margin:10px auto; }
-.helpSection p{ margin:5px 0; }
-</style>
-</head>
-<body>
+<title>ShareTopt</title>
 
-<header>
-    <h1>💡 ShareTopt</h1>
-    <button id="loginBtn">Giriş Yap</button>
-    <button id="logoutBtn">Çıkış</button>
-</header>
-
-<section class="add">
-    <input id="ideaInput" placeholder="Fikrini yaz">
-    <select id="category">
-        <option>AI</option>
-        <option>Oyun</option>
-        <option>Araç</option>
-    </select>
-    <button id="addBtn">Paylaş</button>
-    <button id="helpBtn">Bana Yardımcı Ol</button>
-    <input type="file" id="mediaFile">
-    <button id="uploadBtn">Media Yükle</button>
-</section>
-
-<section id="ideas"></section>
-
+<!-- Firebase SDK -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-// --- FIREBASE CONFIG ---
-const firebaseConfig = {
-  apiKey: "AIzaSyAFtCQjGACAmoOSEIazC648I1BaLPkT8-U",
-  authDomain: "share-your-thoughts-e15a7.firebaseapp.com",
-  databaseURL: "https://share-your-thoughts-e15a7-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "share-your-thoughts-e15a7",
-  storageBucket: "share-your-thoughts-e15a7.firebasestorage.app",
-  messagingSenderId: "137665399298",
-  appId: "1:137665399298:web:60e7087fc41db2670f751b"
-};
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAFtCQjGACAmoOSEIazC648I1BaLPkT8-U",
+    authDomain: "share-your-thoughts-e15a7.firebaseapp.com",
+    databaseURL: "https://share-your-thoughts-e15a7-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "share-your-thoughts-e15a7",
+    storageBucket: "share-your-thoughts-e15a7.firebasestorage.app",
+    messagingSenderId: "137665399298",
+    appId: "1:137665399298:web:60e7087fc41db2670f751b"
+  };
 
-// --- INITIALIZE ---
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
-const auth = getAuth();
-const provider = new GoogleAuthProvider();
-let currentUser = null;
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
 
-// --- ELEMENTS ---
-const ideaInput = document.getElementById("ideaInput");
-const categoryInput = document.getElementById("category");
-const ideasDiv = document.getElementById("ideas");
-const addBtn = document.getElementById("addBtn");
-const mediaInput = document.getElementById("mediaFile");
-const uploadBtn = document.getElementById("uploadBtn");
-const loginBtn = document.getElementById("loginBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const helpBtn = document.getElementById("helpBtn");
+  window.login = async function() {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      document.getElementById("login-btn").style.display = "none";
+      document.getElementById("user-info").innerText = "Merhaba, " + user.displayName;
+    } catch (error) {
+      alert("Giriş hatası: " + error.message);
+    }
+  }
 
-// --- AUTH ---
-loginBtn.onclick = () => signInWithPopup(auth, provider)
-    .then(result => { currentUser = result.user; loadIdeas(); })
-    .catch(console.error);
-
-logoutBtn.onclick = () => signOut(auth).then(()=>{ currentUser=null; loadIdeas(); });
-
-onAuthStateChanged(auth, user => currentUser=user);
-
-// --- ADD IDEA ---
-addBtn.onclick = async () => {
-    if(!currentUser) return alert("Giriş yapmalısınız!");
-    const text = ideaInput.value.trim();
-    const category = categoryInput.value;
-    if(!text) return alert("Fikir boş olamaz!");
-    await addDoc(collection(db,"ideas"),{
-        text, category,
-        ownerId: currentUser.uid,
-        ownerName: currentUser.displayName,
-        votes:0,
-        created:Date.now()
+  window.addIdea = function() {
+    const input = document.getElementById("idea-input");
+    const ideaText = input.value.trim();
+    if (!ideaText) return;
+    const ideasRef = ref(db, "ideas");
+    const newIdeaRef = push(ideasRef);
+    set(newIdeaRef, {
+      text: ideaText,
+      timestamp: Date.now()
     });
-    ideaInput.value="";
-    loadIdeas();
-};
+    input.value = "";
+  }
 
-// --- LOAD IDEAS ---
-async function loadIdeas(){
-    const ideasSnapshot = await getDocs(collection(db,"ideas"));
-    ideasDiv.innerHTML="";
-    ideasSnapshot.forEach(docSnap=>{
-        const data = docSnap.data();
-        const key = docSnap.id;
+  function renderIdeas() {
+    const ideasRef = ref(db, "ideas");
+    onValue(ideasRef, (snapshot) => {
+      const container = document.getElementById("ideas-container");
+      container.innerHTML = "";
+      snapshot.forEach((childSnapshot) => {
+        const data = childSnapshot.val();
+        const id = childSnapshot.key;
         const div = document.createElement("div");
-        div.className = "idea";
+        div.className = "idea-card";
         div.innerHTML = `
-            <h3>${data.text}</h3>
-            <p>Kategori: ${data.category}</p>
-            <p>Paylaşan: ${data.ownerName}</p>
-            <span class="vote" onclick="vote('${key}',${data.votes})">⬆ ${data.votes}</span>
-            ${(currentUser && data.ownerId===currentUser.uid)? `<button onclick="deleteIdea('${key}')">Sil</button>`:""}
+          <p>${data.text}</p>
+          <button onclick="deleteIdea('${id}')">Sil</button>
         `;
-        ideasDiv.appendChild(div);
+        container.appendChild(div);
+      });
     });
+  }
+
+  window.deleteIdea = function(id) {
+    if(confirm("Bu fikri silmek istediğine emin misin?")) {
+      remove(ref(db, "ideas/" + id));
+    }
+  }
+
+  window.onload = renderIdeas;
+</script>
+
+<style>
+:root {
+  --bg-color: #0f172a;
+  --card-bg: #1e293b;
+  --accent-yellow: #facc15;
+  --text-main: #e2e8f0;
+  --text-muted: #94a3b8;
+  --border-radius: 12px;
+  --transition: all 0.3s ease;
+  --shadow-default: 0 4px 15px rgba(0,0,0,0.25);
+  --shadow-hover: 0 10px 30px rgba(0,0,0,0.4);
 }
 
-// --- VOTE ---
-window.vote = async (key,votes) => {
-    if(!currentUser) return alert("Giriş yapmalısınız!");
-    const ideaRef = doc(db,"ideas",key);
-    await updateDoc(ideaRef,{votes:votes+1});
-};
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.6;
+}
 
-// --- DELETE ---
-window.deleteIdea = async (key) => {
-    if(!currentUser) return alert("Giriş yapmalısınız!");
-    const ideaRef = doc(db,"ideas",key);
-    await deleteDoc(ideaRef);
-};
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-// --- MEDIA UPLOAD ---
-uploadBtn.onclick = async () => {
-    if(!currentUser) return alert("Giriş yapmalısınız!");
-    const file = mediaInput.files[0];
-    if(!file) return;
-    const storageRef = ref(storage, `media/${currentUser.uid}_${Date.now()}_${file.name}`);
-    await uploadBytes(storageRef,file);
-    const url = await getDownloadURL(storageRef);
-    console.log("Media URL:",url);
-};
+.banner-area {
+  background-color: var(--card-bg);
+  height: 200px;
+  border-radius: var(--border-radius);
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5em;
+  color: var(--accent-yellow);
+  box-shadow: var(--shadow-default);
+  text-align: center;
+  overflow: hidden;
+}
 
-// --- HELP DATA ---
-const helpData = [
-    { question: "Fikir eklemek için ne yapmalıyım?", answer: "Metin kutusuna fikrini yaz ve Paylaş butonuna tıkla." },
-    { question: "Kategori nasıl seçilir?", answer: "Kategori açılır menüsünden uygun kategoriyi seç." },
-    { question: "Media yükleyebilir miyim?", answer: "Dosya seçip Media Yükle butonuna basabilirsin." },
-    { question: "Fikri silebilir miyim?", answer: "Kendi eklediğin fikirlerin yanında çıkan Sil butonuna bas." },
-    { question: "Oy kullanabilir miyim?", answer: "Her fikir için yukarı ok simgesine tıklayarak oy verebilirsin." }
-];
+.idea-card {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-default);
+  transition: transform var(--transition), box-shadow var(--transition);
+  cursor: pointer;
+}
 
-// --- HELP BUTTON ---
-helpBtn.onclick = () => {
-    let helpDiv = document.querySelector(".helpSection");
-    if(helpDiv) helpDiv.remove();
-    helpDiv = document.createElement("div");
-    helpDiv.className = "helpSection";
-    helpDiv.innerHTML = "<h3>Öğretici Yardım</h3>";
-    helpData.forEach(item=>{
-        const q = document.createElement("p");
-        q.innerHTML = `<b>Soru:</b> ${item.question}`;
-        const a = document.createElement("p");
-        a.innerHTML = `<b>Cevap:</b> ${item.answer}`;
-        helpDiv.appendChild(q);
-        helpDiv.appendChild(a);
-    });
-    document.body.appendChild(helpDiv);
-};
+.idea-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: var(--shadow-hover);
+}
 
-// --- INIT ---
-loadIdeas();
+h1,h2,h3 { color: var(--accent-yellow); margin-top:0; margin-bottom:15px; font-weight:600; }
+h1 { font-size:2.5em; }
+h2 { font-size:2em; }
+h3 { font-size:1.75em; }
 
-</script>
+input, textarea {
+  width:100%; padding:12px; margin-bottom:15px;
+  background-color: var(--bg-color); border:1px solid #475569;
+  border-radius:8px; color: var(--text-main);
+}
+
+input:focus, textarea:focus {
+  border-color: var(--accent-yellow);
+  box-shadow: 0 0 0 3px rgba(250,204,21,0.3);
+  outline:none;
+}
+
+button {
+  background-color: var(--accent-yellow);
+  color: #0f172a;
+  padding:12px 24px;
+  border-radius:8px;
+  font-weight:700;
+  border:none;
+  cursor:pointer;
+  transition: var(--transition);
+}
+
+button:hover {
+  background-color: #eab308;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(250,204,21,0.3);
+}
+
+.help-section {
+  background-color: var(--card-bg);
+  border-radius:12px;
+  padding:30px;
+  margin-top:30px;
+  margin-bottom:30px;
+  box-shadow: var(--shadow-default);
+  border-left:5px solid var(--accent-yellow);
+}
+
+.help-section h2 { color: var(--accent-yellow); margin-bottom:20px; }
+.help-section p { font-size:1.1em; color: var(--text-muted); }
+
+@media(max-width:768px){
+  body { padding:15px; }
+  h1{font-size:2em;} h2{font-size:1.75em;} h3{font-size:1.5em;}
+  button { width:100%; padding:15px; font-size:1.1em;}
+  .banner-area{height:150px; font-size:1.2em;}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <header>
+    <h1>ShareTopt</h1>
+    <div id="user-info"></div>
+    <button id="login-btn" onclick="login()">Google ile Giriş</button>
+  </header>
+
+  <section class="banner-area">Paylaşmak istediğin fikirleri ekle!</section>
+
+  <section class="idea-input">
+    <input type="text" id="idea-input" placeholder="Fikrinizi yazın...">
+    <button onclick="addIdea()">Fikri Ekle</button>
+  </section>
+
+  <section class="help-section">
+    <h2>Yardım / Öğretici</h2>
+    <p>Fikrinizi eklemek için yukarıdaki kutuya yazın ve "Fikri Ekle" butonuna tıklayın. Daha sonra fikirler aşağıda görünecek.</p>
+    <p>Fikirleri silmek için fikir kutusundaki "Sil" butonuna basın.</p>
+  </section>
+
+  <section class="idea-grid" id="ideas-container"></section>
+</div>
 </body>
 </html>
