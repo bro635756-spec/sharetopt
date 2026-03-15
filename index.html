@@ -3,215 +3,202 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ShareTopt</title>
+<title>ShareTopt v18</title>
 
 <!-- Firebase SDK -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-  import { getDatabase, ref, push, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
-  // Firebase config
-  const firebaseConfig = {
-    apiKey: "AIzaSyAFtCQjGACAmoOSEIazC648I1BaLPkT8-U",
-    authDomain: "share-your-thoughts-e15a7.firebaseapp.com",
-    databaseURL: "https://share-your-thoughts-e15a7-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "share-your-thoughts-e15a7",
-    storageBucket: "share-your-thoughts-e15a7.firebasestorage.app",
-    messagingSenderId: "137665399298",
-    appId: "1:137665399298:web:60e7087fc41db2670f751b"
-  };
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAFtCQjGACAmoOSEIazC648I1BaLPkT8-U",
+  authDomain: "share-your-thoughts-e15a7.firebaseapp.com",
+  databaseURL: "https://share-your-thoughts-e15a7-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "share-your-thoughts-e15a7",
+  storageBucket: "share-your-thoughts-e15a7.firebasestorage.app",
+  messagingSenderId: "137665399298",
+  appId: "1:137665399298:web:60e7087fc41db2670f751b"
+};
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
+// Initialize
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
 
-  window.login = async function() {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      document.getElementById("login-btn").style.display = "none";
-      document.getElementById("user-info").innerText = "Merhaba, " + user.displayName;
-    } catch (error) {
-      alert("Giriş hatası: " + error.message);
-    }
+let currentUser = null;
+
+// Auth state
+onAuthStateChanged(auth, (user) => {
+  if(user) {
+    currentUser = user;
+    document.getElementById("user-info").innerText = "Merhaba, " + user.email;
+    document.getElementById("auth-section").style.display = "none";
+    document.getElementById("app-section").style.display = "block";
+    renderIdeas();
+    renderFriends();
+  } else {
+    currentUser = null;
+    document.getElementById("auth-section").style.display = "block";
+    document.getElementById("app-section").style.display = "none";
   }
+});
 
-  window.addIdea = function() {
-    const input = document.getElementById("idea-input");
-    const ideaText = input.value.trim();
-    if (!ideaText) return;
-    const ideasRef = ref(db, "ideas");
-    const newIdeaRef = push(ideasRef);
-    set(newIdeaRef, {
-      text: ideaText,
-      timestamp: Date.now()
+// Register
+window.register = async () => {
+  const email = document.getElementById("reg-email").value;
+  const pass = document.getElementById("reg-pass").value;
+  if(!email || !pass) return alert("Email ve şifre girin");
+  try {
+    const res = await createUserWithEmailAndPassword(auth,email,pass);
+    const uid = "sj-" + Math.random().toString(36).substring(2,10) + "_v18-" + Date.now();
+    set(ref(db,"users/"+res.user.uid),{email:email,userId:uid});
+    alert("Kayıt başarılı! ID: "+uid);
+  } catch(e){alert(e.message);}
+}
+
+// Login
+window.login = async () => {
+  const email = document.getElementById("login-email").value;
+  const pass = document.getElementById("login-pass").value;
+  if(!email || !pass) return alert("Email ve şifre girin");
+  try {
+    await signInWithEmailAndPassword(auth,email,pass);
+  } catch(e){alert(e.message);}
+}
+
+// Add Idea
+window.addIdea = () => {
+  const txt = document.getElementById("idea-input").value.trim();
+  if(!txt || !currentUser) return;
+  const newRef = push(ref(db,"ideas"));
+  set(newRef,{
+    text: txt,
+    author: currentUser.email,
+    timestamp: Date.now()
+  });
+  document.getElementById("idea-input").value="";
+}
+
+// Delete Idea
+window.deleteIdea = (id) => {
+  if(confirm("Bu fikri silmek istediğine emin misin?")){
+    remove(ref(db,"ideas/"+id));
+  }
+}
+
+// Render Ideas
+function renderIdeas(){
+  onValue(ref(db,"ideas"),(snap)=>{
+    const container = document.getElementById("ideas-container");
+    container.innerHTML="";
+    snap.forEach(child=>{
+      const data = child.val();
+      const div = document.createElement("div");
+      div.className="idea-card";
+      div.innerHTML=`<p>${data.text}</p><small>${data.author}</small>
+      <button onclick="deleteIdea('${child.key}')">Sil</button>`;
+      container.appendChild(div);
     });
-    input.value = "";
-  }
+  });
+}
 
-  function renderIdeas() {
-    const ideasRef = ref(db, "ideas");
-    onValue(ideasRef, (snapshot) => {
-      const container = document.getElementById("ideas-container");
-      container.innerHTML = "";
-      snapshot.forEach((childSnapshot) => {
-        const data = childSnapshot.val();
-        const id = childSnapshot.key;
-        const div = document.createElement("div");
-        div.className = "idea-card";
-        div.innerHTML = `
-          <p>${data.text}</p>
-          <button onclick="deleteIdea('${id}')">Sil</button>
-        `;
-        container.appendChild(div);
-      });
+// Friends
+window.addFriend = () => {
+  const friendEmail = document.getElementById("friend-input").value.trim();
+  if(!friendEmail || !currentUser) return;
+  set(ref(db,"friends/"+currentUser.uid+"/"+friendEmail),{email:friendEmail});
+  document.getElementById("friend-input").value="";
+  renderFriends();
+}
+
+function renderFriends(){
+  const list = document.getElementById("friends-list");
+  list.innerHTML="";
+  onValue(ref(db,"friends/"+currentUser.uid),(snap)=>{
+    snap.forEach(child=>{
+      const li = document.createElement("li");
+      li.textContent = child.val().email;
+      list.appendChild(li);
     });
-  }
-
-  window.deleteIdea = function(id) {
-    if(confirm("Bu fikri silmek istediğine emin misin?")) {
-      remove(ref(db, "ideas/" + id));
-    }
-  }
-
-  window.onload = renderIdeas;
+  });
+}
 </script>
 
 <style>
-:root {
-  --bg-color: #0f172a;
-  --card-bg: #1e293b;
-  --accent-yellow: #facc15;
-  --text-main: #e2e8f0;
-  --text-muted: #94a3b8;
-  --border-radius: 12px;
-  --transition: all 0.3s ease;
-  --shadow-default: 0 4px 15px rgba(0,0,0,0.25);
-  --shadow-hover: 0 10px 30px rgba(0,0,0,0.4);
+:root{
+  --bg:#0f172a;--card:#1e293b;--accent:#facc15;--text:#e2e8f0;
+  --border-radius:12px;--transition:all 0.3s ease;
+  --shadow:0 4px 15px rgba(0,0,0,0.25);--shadow-h:0 10px 30px rgba(0,0,0,0.4);
 }
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 0;
-  padding: 20px;
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  line-height: 1.6;
-}
-
-.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-
-.banner-area {
-  background-color: var(--card-bg);
-  height: 200px;
-  border-radius: var(--border-radius);
-  margin-bottom: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.5em;
-  color: var(--accent-yellow);
-  box-shadow: var(--shadow-default);
-  text-align: center;
-  overflow: hidden;
-}
-
-.idea-card {
-  background-color: var(--card-bg);
-  border-radius: var(--border-radius);
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: var(--shadow-default);
-  transition: transform var(--transition), box-shadow var(--transition);
-  cursor: pointer;
-}
-
-.idea-card:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: var(--shadow-hover);
-}
-
-h1,h2,h3 { color: var(--accent-yellow); margin-top:0; margin-bottom:15px; font-weight:600; }
-h1 { font-size:2.5em; }
-h2 { font-size:2em; }
-h3 { font-size:1.75em; }
-
-input, textarea {
-  width:100%; padding:12px; margin-bottom:15px;
-  background-color: var(--bg-color); border:1px solid #475569;
-  border-radius:8px; color: var(--text-main);
-}
-
-input:focus, textarea:focus {
-  border-color: var(--accent-yellow);
-  box-shadow: 0 0 0 3px rgba(250,204,21,0.3);
-  outline:none;
-}
-
-button {
-  background-color: var(--accent-yellow);
-  color: #0f172a;
-  padding:12px 24px;
-  border-radius:8px;
-  font-weight:700;
-  border:none;
-  cursor:pointer;
-  transition: var(--transition);
-}
-
-button:hover {
-  background-color: #eab308;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(250,204,21,0.3);
-}
-
-.help-section {
-  background-color: var(--card-bg);
-  border-radius:12px;
-  padding:30px;
-  margin-top:30px;
-  margin-bottom:30px;
-  box-shadow: var(--shadow-default);
-  border-left:5px solid var(--accent-yellow);
-}
-
-.help-section h2 { color: var(--accent-yellow); margin-bottom:20px; }
-.help-section p { font-size:1.1em; color: var(--text-muted); }
-
-@media(max-width:768px){
-  body { padding:15px; }
-  h1{font-size:2em;} h2{font-size:1.75em;} h3{font-size:1.5em;}
-  button { width:100%; padding:15px; font-size:1.1em;}
-  .banner-area{height:150px; font-size:1.2em;}
-}
+body{margin:0;padding:0;font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);}
+header{display:flex;justify-content:space-between;align-items:center;padding:15px;background:var(--card);border-bottom:1px solid #475569;border-radius:var(--border-radius);}
+nav{position:relative;}
+.nav-menu{display:none;position:absolute;top:50px;right:0;background:var(--card);border-radius:var(--border-radius);width:200px;box-shadow:var(--shadow);flex-direction:column;}
+.nav-menu a{padding:10px 15px;color:var(--text);text-decoration:none;}
+.nav-menu a:hover{background:var(--accent);color:#0f172a;}
+.hamburger{cursor:pointer;font-size:1.5em;}
+.container{max-width:1200px;margin:0 auto;padding:20px;}
+.banner-area{background-color:var(--card);height:150px;border-radius:var(--border-radius);display:flex;align-items:center;justify-content:center;margin-bottom:20px;}
+input,textarea{width:100%;padding:10px;margin-bottom:10px;background:var(--bg);border:1px solid #475569;border-radius:8px;color:var(--text);}
+input:focus,textarea:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px rgba(250,204,21,0.3);}
+button{background:var(--accent);color:#0f172a;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;transition:var(--transition);}
+button:hover{background:#eab308;transform:translateY(-2px);box-shadow:0 4px 12px rgba(250,204,21,0.3);}
+.idea-card{background:var(--card);padding:15px;margin-bottom:10px;border-radius:var(--border-radius);box-shadow:var(--shadow);transition:var(--transition);}
+.idea-card:hover{transform:translateY(-3px) scale(1.02);box-shadow:var(--shadow-h);}
+.help-section{background:var(--card);border-left:5px solid var(--accent);padding:20px;margin:20px 0;border-radius:var(--border-radius);}
+@media(max-width:768px){.nav-menu{width:150px;}}
 </style>
 </head>
 
 <body>
+<header>
+  <div>ShareTopt v18</div>
+  <div class="hamburger" onclick="document.querySelector('.nav-menu').classList.toggle('show')">☰</div>
+  <nav>
+    <div class="nav-menu">
+      <a href="#ideas-container">Fikirler</a>
+      <a href="#friends-section">Arkadaşlar</a>
+      <a href="#help">Yardım</a>
+    </div>
+  </nav>
+</header>
+
 <div class="container">
-  <header>
-    <h1>ShareTopt</h1>
-    <div id="user-info"></div>
-    <button id="login-btn" onclick="login()">Google ile Giriş</button>
-  </header>
+  <div id="auth-section">
+    <h2>Kayıt Ol / Giriş Yap</h2>
+    <input type="email" id="reg-email" placeholder="Email">
+    <input type="password" id="reg-pass" placeholder="Şifre">
+    <button onclick="register()">Kayıt Ol</button>
+    <hr>
+    <input type="email" id="login-email" placeholder="Email">
+    <input type="password" id="login-pass" placeholder="Şifre">
+    <button onclick="login()">Giriş Yap</button>
+  </div>
 
-  <section class="banner-area">Paylaşmak istediğin fikirleri ekle!</section>
+  <div id="app-section" style="display:none;">
+    <section class="banner-area">Paylaşmak istediğin fikirleri ekle!</section>
 
-  <section class="idea-input">
     <input type="text" id="idea-input" placeholder="Fikrinizi yazın...">
     <button onclick="addIdea()">Fikri Ekle</button>
-  </section>
 
-  <section class="help-section">
-    <h2>Yardım / Öğretici</h2>
-    <p>Fikrinizi eklemek için yukarıdaki kutuya yazın ve "Fikri Ekle" butonuna tıklayın. Daha sonra fikirler aşağıda görünecek.</p>
-    <p>Fikirleri silmek için fikir kutusundaki "Sil" butonuna basın.</p>
-  </section>
+    <section id="ideas-container"></section>
 
-  <section class="idea-grid" id="ideas-container"></section>
+    <section id="friends-section">
+      <h3>Arkadaş Ekle</h3>
+      <input type="email" id="friend-input" placeholder="Email girin">
+      <button onclick="addFriend()">Arkadaş Ekle</button>
+      <ul id="friends-list"></ul>
+    </section>
+
+    <section class="help-section" id="help">
+      <h2>Yardım / Öğretici</h2>
+      <p>Fikir eklemek için yukarıya yazın ve "Fikri Ekle"ye tıklayın.</p>
+      <p>Arkadaş eklemek için email girip "Arkadaş Ekle"ye tıklayın.</p>
+      <p>Fikirleri silmek için "Sil" butonuna basın.</p>
+    </section>
+  </div>
 </div>
 </body>
-</html>
+      </html>
