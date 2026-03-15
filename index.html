@@ -9,7 +9,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
 import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -29,58 +29,64 @@ const auth = getAuth(app);
 
 let currentUser = null;
 
-// Auth State
-onAuthStateChanged(auth,user=>{
+// Auth state listener
+onAuthStateChanged(auth, user => {
   if(user){
-    currentUser=user;
-    document.getElementById("user-email").innerText=user.email;
-    document.getElementById("auth").style.display="none";
-    document.getElementById("app").style.display="block";
+    currentUser = user;
+    document.getElementById("user-email").innerText = user.email;
+    document.getElementById("auth").style.display = "none";
+    document.getElementById("app").style.display = "block";
     loadIdeas();
     loadFriends();
-  }else{
-    currentUser=null;
-    document.getElementById("auth").style.display="block";
-    document.getElementById("app").style.display="none";
+  } else {
+    currentUser = null;
+    document.getElementById("auth").style.display = "block";
+    document.getElementById("app").style.display = "none";
   }
 });
 
 // Register
-window.register=async()=>{
-  const email=document.getElementById("reg-email").value;
-  const pass=document.getElementById("reg-pass").value;
-  if(!email||!pass) return alert("Email ve şifre girin");
+window.register = async () => {
+  const email = document.getElementById("reg-email").value.trim();
+  const pass = document.getElementById("reg-pass").value.trim();
+  if(!email || !pass) return alert("Email ve şifre girin");
   try{
-    const res=await createUserWithEmailAndPassword(auth,email,pass);
-    const uid="sj-"+Math.random().toString(36).substring(2,10)+"_v18-"+Date.now();
-    set(ref(db,"users/"+res.user.uid),{email:email,userId:uid});
+    const res = await createUserWithEmailAndPassword(auth, email, pass);
+    const uid = "sj-" + Math.random().toString(36).substring(2,10) + "_v18-" + Date.now();
+    await set(ref(db,"users/"+res.user.uid), {email: email, userId: uid});
     alert("Kayıt başarılı! ID: "+uid);
-  }catch(e){alert(e.message);}
+  } catch(e) { alert(e.message); }
 }
 
 // Login
-window.login=async()=>{
-  const email=document.getElementById("login-email").value;
-  const pass=document.getElementById("login-pass").value;
-  if(!email||!pass) return alert("Email ve şifre girin");
-  try{await signInWithEmailAndPassword(auth,email,pass);}catch(e){alert(e.message);}
+window.login = async () => {
+  const email = document.getElementById("login-email").value.trim();
+  const pass = document.getElementById("login-pass").value.trim();
+  if(!email || !pass) return alert("Email ve şifre girin");
+  try { await signInWithEmailAndPassword(auth, email, pass); } 
+  catch(e) { alert(e.message); }
+}
+
+// Logout
+window.logout = async () => {
+  if(currentUser) await signOut(auth);
 }
 
 // Add Idea
-window.addIdea=()=>{
-  const txt=document.getElementById("idea-input").value.trim();
-  if(!txt||!currentUser) return;
-  const newRef=push(ref(db,"ideas"));
-  set(newRef,{
-    text:txt,
-    author:currentUser.email,
-    timestamp:Date.now()
+window.addIdea = () => {
+  const txt = document.getElementById("idea-input").value.trim();
+  if(!txt || !currentUser) return;
+  const newRef = push(ref(db,"ideas"));
+  set(newRef, {
+    text: txt,
+    author: currentUser.email,
+    timestamp: Date.now()
   });
-  document.getElementById("idea-input").value="";
+  document.getElementById("idea-input").value = "";
 }
 
 // Delete Idea
-window.deleteIdea=id=>{
+window.deleteIdea = id => {
   if(confirm("Bu fikri silmek istediğine emin misin?")){
     remove(ref(db,"ideas/"+id));
   }
@@ -88,17 +94,17 @@ window.deleteIdea=id=>{
 
 // Load Ideas
 function loadIdeas(){
-  onValue(ref(db,"ideas"),snap=>{
-    const container=document.getElementById("ideas-container");
-    container.innerHTML="";
-    snap.forEach(child=>{
-      const data=child.val();
-      const div=document.createElement("div");
-      div.className="idea-card";
-      div.innerHTML=`
-      <p>${data.text}</p>
-      <small>${data.author}</small>
-      <button onclick="deleteIdea('${child.key}')">Sil</button>
+  const container = document.getElementById("ideas-container");
+  onValue(ref(db,"ideas"), snap => {
+    container.innerHTML = "";
+    snap.forEach(child => {
+      const data = child.val();
+      const div = document.createElement("div");
+      div.className = "idea-card";
+      div.innerHTML = `
+        <p>${data.text}</p>
+        <small>${data.author}</small>
+        <button onclick="deleteIdea('${child.key}')">Sil</button>
       `;
       container.appendChild(div);
     });
@@ -106,22 +112,21 @@ function loadIdeas(){
 }
 
 // Add Friend
-window.addFriend=()=>{
-  const fEmail=document.getElementById("friend-input").value.trim();
-  if(!fEmail||!currentUser) return;
-  set(ref(db,"friends/"+currentUser.uid+"/"+fEmail),{email:fEmail});
-  document.getElementById("friend-input").value="";
-  loadFriends();
+window.addFriend = () => {
+  const fEmail = document.getElementById("friend-input").value.trim();
+  if(!fEmail || !currentUser) return;
+  set(ref(db,"friends/"+currentUser.uid+"/"+fEmail.replace(/\./g,'_')), {email: fEmail});
+  document.getElementById("friend-input").value = "";
 }
 
 // Load Friends
 function loadFriends(){
-  const list=document.getElementById("friends-list");
-  list.innerHTML="";
-  onValue(ref(db,"friends/"+currentUser.uid),snap=>{
-    snap.forEach(child=>{
-      const li=document.createElement("li");
-      li.textContent=child.val().email;
+  const list = document.getElementById("friends-list");
+  onValue(ref(db,"friends/"+currentUser.uid), snap => {
+    list.innerHTML = "";
+    snap.forEach(child => {
+      const li = document.createElement("li");
+      li.textContent = child.val().email;
       list.appendChild(li);
     });
   });
@@ -133,12 +138,12 @@ function loadFriends(){
 body{margin:0;font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);}
 header{display:flex;justify-content:space-between;align-items:center;padding:15px;background:var(--card);border-bottom:1px solid #475569;border-radius:var(--radius);}
 .hamburger{font-size:1.5em;cursor:pointer;}
-.nav-menu{display:none;position:absolute;top:60px;right:10px;background:var(--card);flex-direction:column;width:220px;border-radius:var(--radius);box-shadow:0 4px 15px rgba(0,0,0,0.25);}
+.nav-menu{display:none;position:absolute;top:60px;right:10px;background:var(--card);flex-direction:column;width:220px;border-radius:var(--radius);box-shadow:0 4px 15px rgba(0,0,0,0.25);z-index:10;}
 .nav-menu.show{display:flex;}
 .nav-menu a{padding:12px;display:block;color:var(--text);text-decoration:none;}
 .nav-menu a:hover{background:var(--accent);color:#0f172a;}
 .container{max-width:1200px;margin:0 auto;padding:20px;}
-.banner{background:var(--card);height:180px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:1.5em;}
+.banner{background:var(--card);height:180px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:1.5em;text-align:center;}
 input,textarea{width:100%;padding:12px;margin-bottom:10px;background:var(--bg);border:1px solid #475569;border-radius:8px;color:var(--text);}
 input:focus,textarea:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px rgba(250,204,21,0.3);}
 button{background:var(--accent);color:#0f172a;padding:12px 20px;border:none;border-radius:8px;cursor:pointer;transition:var(--transition);}
@@ -152,12 +157,13 @@ button:hover{background:#eab308;transform:translateY(-2px);box-shadow:0 4px 12px
 </head>
 <body>
 <header>
-  <div>ShareTopt Pro v18</div>
+  <div>ShareTopt Pro v18 - <span id="user-email"></span></div>
   <div class="hamburger" onclick="document.querySelector('.nav-menu').classList.toggle('show')">☰</div>
   <nav class="nav-menu">
     <a href="#ideas-container">Fikirler</a>
     <a href="#friends-section">Arkadaşlar</a>
     <a href="#help-section">Yardım</a>
+    <a href="#" onclick="logout()">Çıkış Yap</a>
   </nav>
 </header>
 
@@ -192,6 +198,7 @@ button:hover{background:#eab308;transform:translateY(-2px);box-shadow:0 4px 12px
       <p>Fikir eklemek için yazıp "Fikri Ekle" butonuna basın.</p>
       <p>Arkadaş eklemek için email girip "Ekle" butonuna tıklayın.</p>
       <p>Fikirleri silmek için "Sil" butonuna basın.</p>
+      <p>Çıkış yapmak için hamburger menüden "Çıkış Yap" seçeneğine tıklayın.</p>
     </section>
   </div>
 </div>
